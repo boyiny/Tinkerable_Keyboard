@@ -1,6 +1,6 @@
 import speech_recognition as sr
 
-class Model_speech_recognition:
+class Model_Speech_Recognition:
     def __init__(self):
         # obtain audio from the microphone
         self.r = sr.Recognizer()
@@ -28,6 +28,6 @@ class Model_speech_recognition:
         return result
 
 if __name__ == '__main__':
-    speechRecognition = Model_speech_recognition()
+    speechRecognition = Model_Speech_Recognition()
     speechRecognition.partnerSpeechInputRecognition()
     

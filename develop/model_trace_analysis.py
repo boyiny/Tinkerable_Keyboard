@@ -3,11 +3,17 @@ import re
 import string
 import pandas as pd
 import time
+import os
 
 from sympy import li
 
 class Model_Trace_Analysis:
     def __init__(self):
+        if not os.path.exists('analysis'):
+            os.makedirs('analysis/klm_bei_record')
+            os.makedirs('analysis/prediction_setting')
+            os.makedirs('analysis/text_entry_record')
+            os.makedirs('analysis/ui_setting')
         timestr = time.strftime("%Y%m%d_%H%M%S")
         self.txt_path = './analysis/klm_bei_record/typing_log_'+str(timestr)+'.txt'
         self.result_path = './analysis/klm_bei_record/human_factor_analysis_'+str(timestr)+'.xlsx'

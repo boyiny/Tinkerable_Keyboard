@@ -3,10 +3,10 @@ from fileinput import filename
 import tkinter as tk 
 from tkinter import BOTTOM, ttk
 from tkinter import filedialog
-from matplotlib.pyplot import text
+# from matplotlib.pyplot import text
 from pathlib import Path
 
-from soupsieve import select
+# from soupsieve import select
 
 class View_trace_analysis:
 

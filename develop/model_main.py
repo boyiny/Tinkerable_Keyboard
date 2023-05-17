@@ -5,9 +5,10 @@ from model_bm25 import Model_Bm25
 from model_gpt2 import Model_Gpt2
 from model_roberta import Model_Roberta
 from model_semantic_sentence_retrieval import Model_Semantic_Sentence_Retrieval
-from model_kwickchat.model_kwickchat import Model_Kwickchat
-from model_speech_recognition import Model_speech_recognition
+# from model_kwickchat.model_kwickchat import Model_Kwickchat
+from model_speech_recognition import Model_Speech_Recognition
 from model_trace_analysis import Model_Trace_Analysis
+from model_chatgpt import Model_ChatGPT
 
 
 class Model_main:
@@ -90,9 +91,14 @@ class Model_main:
     def load_gpt2_sentence(self, option, model=None, seed=None, method=None, max_length=None, no_repeat_ngram_size=None, num_of_beams=None, top_k=None, top_p=None):
         self.gpt2Sentence = Model_Gpt2(option, model, seed, method, max_length, no_repeat_ngram_size, num_of_beams, top_k, top_p)
 
-    def load_kwickchat_sentence(self, option, max_length, min_length, seed, temperature, top_k, top_p, num_of_history_exchanges, persona):
-        self.kwickchatSentence = Model_Kwickchat(option, max_length, min_length, seed, temperature, top_k, top_p, num_of_history_exchanges, persona)
-        self.partnerSpeech = Model_speech_recognition()
+    # def load_kwickchat_sentence(self, option, max_length, min_length, seed, temperature, top_k, top_p, num_of_history_exchanges, persona):
+    #     self.kwickchatSentence = Model_Kwickchat(option, max_length, min_length, seed, temperature, top_k, top_p, num_of_history_exchanges, persona)
+    #     self.partnerSpeech = Model_speech_recognition()
+
+    def load_chatgpt(self):
+        self.chatgptSentence = Model_ChatGPT()
+        self.partnerSpeech = Model_Speech_Recognition()
+
 
     def conv_partner_speech_recognition_kwickchat(self):
         partnerInput = self.partnerSpeech.partnerSpeechInputRecognition()

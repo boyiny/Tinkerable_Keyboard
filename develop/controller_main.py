@@ -7,7 +7,7 @@ from view_main import View_main, View_menu, View_text_box, View_keypad, View_log
 from view_tinker_panel import View_tinker
 from view_text_entry import View_text_edit
 
-import pyttsx3
+# import pyttsx3
 
 import configparser 
 import os
@@ -31,7 +31,7 @@ class Controller_main():
         self.viewTraceAnalysis = View_trace_analysis(self)
         # self.viewLoggingIndicator = View_logging_indicator(self, self.viewMain)
 
-        self.speakEngine = pyttsx3.init()
+        # self.speakEngine = pyttsx3.init()
 
         self.traceLogFile = ""
 
@@ -157,16 +157,16 @@ class Controller_main():
         self.top_k_SENTENCE_GPT2_TOP_P                      = int(self.config['SENTENCE_GPT2_TOP_P']['top_k'])
         self.top_p_SENTENCE_GPT2_TOP_P                      = float(self.config['SENTENCE_GPT2_TOP_P']['top_p'])
 
-        self.max_length_SENTENCE_KWICKCHAT          = int(self.config['SENTENCE_KWICKCHAT']['max_length'])
-        self.min_length_SENTENCE_KWICKCHAT          = int(self.config['SENTENCE_KWICKCHAT']['min_length'])
-        self.seed_SENTENCE_KWICKCHAT                = int(self.config['SENTENCE_KWICKCHAT']['seed'])
-        self.temperature_SENTENCE_KWICKCHAT         = float(self.config['SENTENCE_KWICKCHAT']['temperature'])
-        self.top_k_SENTENCE_KWICKCHAT               = int(self.config['SENTENCE_KWICKCHAT']['top_k'])
-        self.top_p_SENTENCE_KWICKCHAT               = float(self.config['SENTENCE_KWICKCHAT']['top_p'])
-        self.num_of_history_SENTENCE_KWICKCHAT      = int(self.config['SENTENCE_KWICKCHAT']['num_of_history'])
-        self.num_of_persona_SENTENCE_KWICKCHAT      = int(self.config['SENTENCE_KWICKCHAT']['num_of_persona'])
-        self.persona_SENTENCE_KWICKCHAT             = str(self.config['SENTENCE_KWICKCHAT']['persona']).split('|')
-        print(f"Persona list: {self.persona_SENTENCE_KWICKCHAT}")
+        # self.max_length_SENTENCE_KWICKCHAT          = int(self.config['SENTENCE_KWICKCHAT']['max_length'])
+        # self.min_length_SENTENCE_KWICKCHAT          = int(self.config['SENTENCE_KWICKCHAT']['min_length'])
+        # self.seed_SENTENCE_KWICKCHAT                = int(self.config['SENTENCE_KWICKCHAT']['seed'])
+        # self.temperature_SENTENCE_KWICKCHAT         = float(self.config['SENTENCE_KWICKCHAT']['temperature'])
+        # self.top_k_SENTENCE_KWICKCHAT               = int(self.config['SENTENCE_KWICKCHAT']['top_k'])
+        # self.top_p_SENTENCE_KWICKCHAT               = float(self.config['SENTENCE_KWICKCHAT']['top_p'])
+        # self.num_of_history_SENTENCE_KWICKCHAT      = int(self.config['SENTENCE_KWICKCHAT']['num_of_history'])
+        # self.num_of_persona_SENTENCE_KWICKCHAT      = int(self.config['SENTENCE_KWICKCHAT']['num_of_persona'])
+        # self.persona_SENTENCE_KWICKCHAT             = str(self.config['SENTENCE_KWICKCHAT']['persona']).split('|')
+        # print(f"Persona list: {self.persona_SENTENCE_KWICKCHAT}")
 
         self.assign_task()
 
@@ -269,10 +269,13 @@ class Controller_main():
         elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_GPT2_TOP_P':
             method = 'GPT2_TOP_P'
             self.modelMain.load_gpt2_sentence(option=self.sentence_pred_PREDICTION_TASK, model=self.model_SENTENCE_GPT2, method=method, max_length=self.max_length_SENTENCE_GPT2_TOP_P, seed=self.seed_SENTENCE_GPT2_TOP_P, top_k=self.top_k_SENTENCE_GPT2_TOP_P, top_p=self.top_p_SENTENCE_GPT2_TOP_P)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_KWICKCHAT':
-            option = 'KWICKCHAT'
-            self.modelMain.load_kwickchat_sentence(option=self.sentence_pred_PREDICTION_TASK, max_length=self.max_length_SENTENCE_KWICKCHAT, min_length=self.min_length_SENTENCE_KWICKCHAT, seed=self.seed_SENTENCE_KWICKCHAT, temperature=self.temperature_SENTENCE_KWICKCHAT, top_k=self.top_k_SENTENCE_KWICKCHAT, top_p=self.top_p_SENTENCE_KWICKCHAT, num_of_history_exchanges=self.num_of_history_SENTENCE_KWICKCHAT, persona=self.persona_SENTENCE_KWICKCHAT)
-            
+        # elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_KWICKCHAT':
+        #     option = 'KWICKCHAT'
+        #     self.modelMain.load_kwickchat_sentence(option=self.sentence_pred_PREDICTION_TASK, max_length=self.max_length_SENTENCE_KWICKCHAT, min_length=self.min_length_SENTENCE_KWICKCHAT, seed=self.seed_SENTENCE_KWICKCHAT, temperature=self.temperature_SENTENCE_KWICKCHAT, top_k=self.top_k_SENTENCE_KWICKCHAT, top_p=self.top_p_SENTENCE_KWICKCHAT, num_of_history_exchanges=self.num_of_history_SENTENCE_KWICKCHAT, persona=self.persona_SENTENCE_KWICKCHAT)
+        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
+            # TODO Working in progress 2/4/2023
+            # option = 'CHATGPT'
+            self.modelMain.load_chatgpt(option)    
 
         # make the initial pred if there is entered text
         if self.sentence_pred_PREDICTION_TASK == '':
@@ -293,23 +296,23 @@ class Controller_main():
     
     """ KwickChat interaction below """
 
-    def pop_up_conv_partner_window_kwickchat(self):
-        # view: pop up a new dialogue window
-        # press button to recognise speech, or type text directly.
-        # add sentence to historyKwickchat. 
-        self.viewTextEdit.pop_up_conv_partner_window_kwickchat()
+    # def pop_up_conv_partner_window_kwickchat(self):
+    #     # view: pop up a new dialogue window
+    #     # press button to recognise speech, or type text directly.
+    #     # add sentence to historyKwickchat. 
+    #     self.viewTextEdit.pop_up_conv_partner_window_kwickchat()
         
-    def recognize_speech(self):
-        partnerInput = self.modelMain.conv_partner_speech_recognition_kwickchat()
-        self.viewTextEdit.show_conversation_partner_input_kwickchat(partnerInput)
+    # def recognize_speech(self):
+    #     partnerInput = self.modelMain.conv_partner_speech_recognition_kwickchat()
+    #     self.viewTextEdit.show_conversation_partner_input_kwickchat(partnerInput)
         
-    def add_conv_partner_input_to_history(self, editedPartnerInput):
-        self.modelMain.add_conv_partner_input_to_history(editedPartnerInput)
+    # def add_conv_partner_input_to_history(self, editedPartnerInput):
+    #     self.modelMain.add_conv_partner_input_to_history(editedPartnerInput)
 
-    def add_user_input_to_history(self, editedUserInput):
-        # when 'Speak' btn is clicked
-        self.modelMain.add_user_input_to_history(editedUserInput)
-        # self.modelLogData.record_conversation_partner_input(editedUserInput)
+    # def add_user_input_to_history(self, editedUserInput):
+    #     # when 'Speak' btn is clicked
+    #     self.modelMain.add_user_input_to_history(editedUserInput)
+    #     # self.modelLogData.record_conversation_partner_input(editedUserInput)
 
     
     """ KwickChat interaction above """
