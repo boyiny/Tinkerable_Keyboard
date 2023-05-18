@@ -47,7 +47,7 @@ class View_tinker:
     SEN_SIMILARITY = ["Text", "Semantics"]
     SEN_RETRI_TEXT_METHOD = ["BM25Okapi", "BM25L", "BM25Plus"]
     SEN_RETRI_SEMAN_MODEL = ["all-mpnet-base-v2", "multi-qa-mpnet-base-dot-v1", "all-distilroberta-v1", "all-MiniLM-L12-v2", "multi-qa-distilbert-cos-v1", "all-MiniLM-L6-v2", "multi-qa-MiniLM-L6-cos-v1", "paraphrase-multilingual-mpnet-base-v2", "paraphrase-albert-small-v2", "paraphrase-multilingual-MiniLM-L12-v2", "paraphrase-MiniLM-L3-v2", "distiluse-base-multilingual-cased-v1", "distiluse-base-multilingual-cased-v2", "Please input..."]
-    SEN_GEN_METHOD = ["KWickChat", "GPT-2"]
+    SEN_GEN_METHOD = ["ChatGPT", "KWickChat", "GPT-2"]
     SEN_KW_HISTORY_NUM = 3
     SEN_KW_PERSONA_NUM = 3
     SEN_GPT2_APPROACH = ["Greedy search", "Beam search", "Top-k sampling", "Top-p sampling"]
@@ -64,6 +64,11 @@ class View_tinker:
     KW_TEMPERATURE = 0.7
     KW_TOP_K = 0
     KW_TOP_P = 0.9
+
+    CHAT_GPT_TEMPERATURE = 0.5
+    CHATGPT_TEMPERATURE_OPT = ["0.1 (conservative)", "0.3", "0.5 (neutral)", "0.7", "0.9 (imaginative)"]
+
+    SEN_INTERATION_SCENARIO = ["Dialogue", "Narrative"]
 
     lastPersonaNum = 1
 
@@ -139,7 +144,22 @@ class View_tinker:
                 self.config.set('SENTENCE_SEMANTIC_SIMILARITY', 'sen_retri_seman_model', self.senRetriSemanticsModel.get())
         elif self.senPredApproach.get() == "Generation":
             self.config.set('SENTENCE_GENERATION', 'method', self.senGenMethod.get())
-            if self.senGenMethod.get() == "GPT-2":
+            if self.senGenMethod.get() == "ChatGPT":
+                temperature = 0.5
+                if "0.1" in self.senChatGPTTemperature.get(): 
+                    temperature = 0.1
+                elif "0.3" in self.senChatGPTTemperature.get():
+                    temperature = 0.3
+                elif "0.5" in self.senChatGPTTemperature.get():
+                    temperature = 0.5
+                elif "0.7" in self.senChatGPTTemperature.get():
+                    temperature = 0.7
+                elif "0.9" in self.senChatGPTTemperature.get():
+                    temperature = 0.9
+                self.config.set('SENTENCE_CHATGPT', 'temperature', str(temperature))
+                self.config.set('SENTENCE_CHATGPT', 'scenario', self.senChatGPTInterationMethod.get())
+                
+            elif self.senGenMethod.get() == "GPT-2":
                 self.config.set('SENTENCE_GPT2', 'model', self.senGpt2Model.get())
                 self.config.set('SENTENCE_GPT2', 'method', self.senGpt2Approach.get())
                 if self.SENTENCE_PRED_TASK == "SENTENCE_GPT2_GREEDY":
@@ -172,6 +192,9 @@ class View_tinker:
                     personaList.append(p.get())
                 personas = "|".join(personaList)
                 self.config.set('SENTENCE_KWICKCHAT', 'persona', personas) # it is a list
+            elif self.senGenMethod.get() == "ChatGPT":
+                # self.config.set()
+                pass
 
 
     def _save(self):
@@ -837,16 +860,75 @@ class View_tinker:
             self.SENTENCE_PRED_TASK = "SENTENCE_GPT2_TOP_P"
             self.BOOL_SENTENCE_TINKERED = True
 
+
     def _sen_gen_method_combobox(self, event, frame):
         
-        if self.senGenMethod.get() == "GPT-2":
+        if self.senGenMethod.get() == "ChatGPT":
             # row 2
             self.senEntryApproach.current(0)
+            self.senEntryApproach.state(["!disabled"])
+
+            # row 5
+            ttk.Label(frame, text="Interaction Scenario").grid(sticky="E", column=0, row=5)
+            self.senChatGPTInterationMethod = ttk.Combobox(frame, values=self.SEN_INTERATION_SCENARIO, state="readonly")
+            self.senChatGPTInterationMethod.current(0)
+            self.senChatGPTInterationMethod.grid(sticky="W", column=1, row=5)
+
+
+            
+            # row 6
+            ttk.Label(frame, text="      Creativity").grid(sticky="E", column=0, row=6)
+            # ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=5)
+            # senChatGPTTemperatureString = tk.StringVar()
+            self.senChatGPTTemperature = ttk.Combobox(frame, values=self.CHATGPT_TEMPERATURE_OPT, state="readonly")
+            self.senChatGPTTemperature.current(2)
+            self.senChatGPTTemperature.grid(sticky="W", column=1, row=6)
+
+
+            # row 7
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=7)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=7)
+            # row 8
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=8)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=8)
+             # row 9
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=9)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=9)
+            # row 10
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=10)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=10)
+            # row 11
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=11)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=11)
+            # row 12
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=12)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=12)
+            ttk.Label(frame, text="", width=5, padding=5).grid(sticky="W", column=2, row=12)
+            # row 13
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=13)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=13)
+            # row 14
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=14)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=14)
+            # row 15
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=15)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=15)
+            # row 16
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=16)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=16)
+
+            # Assign task
+            self.SENTENCE_PRED_TASK = "SENTENCE_CHATGPT"
+            self.BOOL_SENTENCE_TINKERED = True
+
+        elif self.senGenMethod.get() == "GPT-2":
+            # row 2
+            self.senEntryApproach.current(1)
             self.senEntryApproach.state(["disabled"])
             # row 5
             ttk.Label(frame, text="      Select Model").grid(sticky="E", column=0, row=5)
             self.senGpt2Model = ttk.Combobox(frame, values=self.MODEL_GPT2)
-            self.senGpt2Model.current(1)
+            self.senGpt2Model.current(2)
             self.senGpt2Model.grid(sticky="W", column=1, row=5)
             # self.senGpt2Approach.bind("<<ComboboxSelected>>", lambda event: self._sen_gpt2_approach_combobox(event, frame))
 

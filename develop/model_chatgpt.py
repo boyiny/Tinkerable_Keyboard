@@ -2,26 +2,35 @@ import openai
 
 class Model_ChatGPT:
 
-    def __init__(self) -> None:
+    def __init__(self, option, sentence_entry_approach, temperature) -> None:
+        print(f"ChatGPT option: {option}, sentence_entry_approach: {sentence_entry_approach}, temperature: {temperature}")
         openai.api_key = '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'
+        self.OPTION = option
+        self.SENTENCE_ENTRY_APPROACH = sentence_entry_approach
+        self.TEMPERATURE = temperature
         self._assign_task()
         
     def _assign_task(self):
         self.dialogue = Model_ChatGPT()
         prompt = "You are helping a non-speaking individual with motor disabilities to generate sentences in a conversation. The conversation partner will send a message, indicated by 'A: ', then I will type keywords, indicated by 'B: '. Generate a full response using the keywords indicated by 'B: '. These sentence predictions need to follow the social rules and make sense in the whole conversation. ### Example: 'A: what do you do?' 'B: student medical cambridge' You are expected to generate 'I am a medical student in Cambridge.' ### Please reply 'yes' if you understand this task."
         text = dialogue.generate_sentence_keyword_based(prompt)
+        print("Developer talking to AI: "+prompt)
         print("AI: "+text.choices[0].text.strip())
 
-    def generate_sentence_keyword_based(self, prompt):
+    def generate_sentence_keyword_based(self, history, prompt):
         response = openai.Completion.create(
             engine='text-davinci-003',
             prompt=prompt,
             n=4,
             stop=None,
-            temperature=0.5,
+            temperature=self.TEMPERATURE,
             max_tokens=40
         )
         return response
+
+    def generate_sentence_left_to_right(self, history, prompt):
+        pass
+
 
 if __name__ == '__main__':
     dialogue = Model_ChatGPT()

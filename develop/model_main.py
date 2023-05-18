@@ -95,7 +95,7 @@ class Model_main:
     #     self.kwickchatSentence = Model_Kwickchat(option, max_length, min_length, seed, temperature, top_k, top_p, num_of_history_exchanges, persona)
     #     self.partnerSpeech = Model_speech_recognition()
 
-    def load_chatgpt(self):
+    def load_chatgpt(self, option, sentence_entry_approach, temperature):
         self.chatgptSentence = Model_ChatGPT()
         self.partnerSpeech = Model_Speech_Recognition()
 

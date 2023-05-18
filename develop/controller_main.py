@@ -157,6 +157,8 @@ class Controller_main():
         self.top_k_SENTENCE_GPT2_TOP_P                      = int(self.config['SENTENCE_GPT2_TOP_P']['top_k'])
         self.top_p_SENTENCE_GPT2_TOP_P                      = float(self.config['SENTENCE_GPT2_TOP_P']['top_p'])
 
+        self.temperature_SENTENCE_CHATGPT             = float(self.config['SENTENCE_CHATGPT']['temperature'])
+
         # self.max_length_SENTENCE_KWICKCHAT          = int(self.config['SENTENCE_KWICKCHAT']['max_length'])
         # self.min_length_SENTENCE_KWICKCHAT          = int(self.config['SENTENCE_KWICKCHAT']['min_length'])
         # self.seed_SENTENCE_KWICKCHAT                = int(self.config['SENTENCE_KWICKCHAT']['seed'])
@@ -274,8 +276,8 @@ class Controller_main():
         #     self.modelMain.load_kwickchat_sentence(option=self.sentence_pred_PREDICTION_TASK, max_length=self.max_length_SENTENCE_KWICKCHAT, min_length=self.min_length_SENTENCE_KWICKCHAT, seed=self.seed_SENTENCE_KWICKCHAT, temperature=self.temperature_SENTENCE_KWICKCHAT, top_k=self.top_k_SENTENCE_KWICKCHAT, top_p=self.top_p_SENTENCE_KWICKCHAT, num_of_history_exchanges=self.num_of_history_SENTENCE_KWICKCHAT, persona=self.persona_SENTENCE_KWICKCHAT)
         elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
             # TODO Working in progress 2/4/2023
-            # option = 'CHATGPT'
-            self.modelMain.load_chatgpt(option)    
+            option = 'CHATGPT'
+            self.modelMain.load_chatgpt(option, self.sentence_entry_approach_SENTENCE_PREDICTION, self.temperature_SENTENCE_CHATGPT) 
 
         # make the initial pred if there is entered text
         if self.sentence_pred_PREDICTION_TASK == '':
