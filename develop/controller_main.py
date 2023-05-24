@@ -6,8 +6,8 @@ from model_main import Model_main
 from view_main import View_main, View_menu, View_text_box, View_keypad, View_logging_indicator
 from view_tinker_panel import View_tinker
 from view_text_entry import View_text_edit
-
-# import pyttsx3
+import pyttsx3
+from gtts import gTTS
 
 import configparser 
 import os
@@ -31,7 +31,11 @@ class Controller_main():
         self.viewTraceAnalysis = View_trace_analysis(self)
         # self.viewLoggingIndicator = View_logging_indicator(self, self.viewMain)
 
-        # self.speakEngine = pyttsx3.init()
+        self.speakEngine = pyttsx3.init()
+        # voice = self.speakEngine.getProperty('voice')
+        # self.speakEngine.setProperty('voice', voice[0].id)
+        self.speakEngine.setProperty('rate', 150)
+        self.speakEngine.setProperty('volume', 1.2)
 
         self.traceLogFile = ""
 
@@ -71,6 +75,14 @@ class Controller_main():
         self.auto_load_the_latest_prediction_settings()
         self.auto_load_the_latest_ui_settings()
         
+    def text_to_speech(self, text):
+        tts = gTTS(text=text, lang='en')
+        filename = "speak.mp3"
+        tts.save(filename)
+        # os.system(f"start {filename}")
+        # playsound(filename)
+
+
 
     def get_tinker_data(self):
         self.file = os.path.realpath(os.path.join(os.path.dirname(__file__), 'tinker.ini'))
@@ -158,6 +170,7 @@ class Controller_main():
         self.top_p_SENTENCE_GPT2_TOP_P                      = float(self.config['SENTENCE_GPT2_TOP_P']['top_p'])
 
         self.temperature_SENTENCE_CHATGPT             = float(self.config['SENTENCE_CHATGPT']['temperature'])
+        self.interaction_scenario_CHATGPT             = str(self.config['SENTENCE_CHATGPT']['scenario'])
 
         # self.max_length_SENTENCE_KWICKCHAT          = int(self.config['SENTENCE_KWICKCHAT']['max_length'])
         # self.min_length_SENTENCE_KWICKCHAT          = int(self.config['SENTENCE_KWICKCHAT']['min_length'])
@@ -275,9 +288,8 @@ class Controller_main():
         #     option = 'KWICKCHAT'
         #     self.modelMain.load_kwickchat_sentence(option=self.sentence_pred_PREDICTION_TASK, max_length=self.max_length_SENTENCE_KWICKCHAT, min_length=self.min_length_SENTENCE_KWICKCHAT, seed=self.seed_SENTENCE_KWICKCHAT, temperature=self.temperature_SENTENCE_KWICKCHAT, top_k=self.top_k_SENTENCE_KWICKCHAT, top_p=self.top_p_SENTENCE_KWICKCHAT, num_of_history_exchanges=self.num_of_history_SENTENCE_KWICKCHAT, persona=self.persona_SENTENCE_KWICKCHAT)
         elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
-            # TODO Working in progress 2/4/2023
             option = 'CHATGPT'
-            self.modelMain.load_chatgpt(option, self.sentence_entry_approach_SENTENCE_PREDICTION, self.temperature_SENTENCE_CHATGPT) 
+            self.modelMain.load_chatgpt(option, self.sentence_entry_approach_SENTENCE_PREDICTION, self.interaction_scenario_CHATGPT, self.temperature_SENTENCE_CHATGPT) 
 
         # make the initial pred if there is entered text
         if self.sentence_pred_PREDICTION_TASK == '':
@@ -296,28 +308,28 @@ class Controller_main():
 
     """ Tinker Panel responses above """
     
-    """ KwickChat interaction below """
+    """ ChatGPT interaction below """
 
-    # def pop_up_conv_partner_window_kwickchat(self):
-    #     # view: pop up a new dialogue window
-    #     # press button to recognise speech, or type text directly.
-    #     # add sentence to historyKwickchat. 
-    #     self.viewTextEdit.pop_up_conv_partner_window_kwickchat()
+    def pop_up_conv_partner_window_chatgpt(self):
+        # view: pop up a new dialogue window
+        # press button to recognise speech, or type text directly.
+        # add sentence to historyKwickchat. 
+        self.viewTextEdit.pop_up_conv_partner_window_chatgpt()
         
-    # def recognize_speech(self):
-    #     partnerInput = self.modelMain.conv_partner_speech_recognition_kwickchat()
-    #     self.viewTextEdit.show_conversation_partner_input_kwickchat(partnerInput)
+    def recognize_speech(self):
+        partnerInput = self.modelMain.conv_partner_speech_recognition_chatgpt()
+        self.viewTextEdit.show_conversation_partner_input_chatgpt(partnerInput)
         
-    # def add_conv_partner_input_to_history(self, editedPartnerInput):
-    #     self.modelMain.add_conv_partner_input_to_history(editedPartnerInput)
+    def add_conv_partner_input_to_history(self, editedPartnerInput):
+        self.modelMain.add_conv_partner_input_to_history(editedPartnerInput)
 
-    # def add_user_input_to_history(self, editedUserInput):
-    #     # when 'Speak' btn is clicked
-    #     self.modelMain.add_user_input_to_history(editedUserInput)
-    #     # self.modelLogData.record_conversation_partner_input(editedUserInput)
+    def add_user_input_to_history(self, editedUserInput):
+        # when 'Speak' btn is clicked
+        self.modelMain.add_user_input_to_history(editedUserInput)
+        # self.modelLogData.record_conversation_partner_input(editedUserInput)
 
     
-    """ KwickChat interaction above """
+    """ ChatGPT interaction above """
 
    
 
@@ -391,10 +403,11 @@ class Controller_main():
                 self.viewKeypad.clear_placed_sentences()
         
         # Collcet user input as conversation history
-        if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_KWICKCHAT':
+        if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
             if caption == 'Speak':
-                self.add_user_input_to_history(entry)
-                self.pop_up_conv_partner_window_kwickchat()
+                self.add_user_input_to_history(entry) 
+                if self.interaction_scenario_CHATGPT == 'Dialogue':
+                    self.pop_up_conv_partner_window_chatgpt()
                 # self.modelLogData.recored_sentence_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, finishedSen=entry)
 
         # Trace record
@@ -708,9 +721,10 @@ class Controller_main():
     def speak_text(self, text):
         self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, currentSen = text)
         self.modelLogData.record_sentence_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, finishedSen=text)
+        # self.text_to_speech(text)
         self.speakEngine.say(text)
         self.speakEngine.runAndWait()
-        self.speakEngine.stop()
+        # self.speakEngine.stop()
     """ Speak above """
 
 if __name__ == '__main__':

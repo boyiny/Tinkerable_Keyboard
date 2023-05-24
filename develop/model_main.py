@@ -21,7 +21,8 @@ class Model_main:
 
     SENT_ENTRY_APPROACH = 'Left to right' 
     
-    historyKwickchat = []    
+    # historyKwickchat = []    
+    conversation_history = []
 
     # Don't change
     wordPredNum = 4 
@@ -95,21 +96,25 @@ class Model_main:
     #     self.kwickchatSentence = Model_Kwickchat(option, max_length, min_length, seed, temperature, top_k, top_p, num_of_history_exchanges, persona)
     #     self.partnerSpeech = Model_speech_recognition()
 
-    def load_chatgpt(self, option, sentence_entry_approach, temperature):
-        self.chatgptSentence = Model_ChatGPT()
+    def load_chatgpt(self, option, sentence_entry_approach, interaction_scenario, temperature):
+        self.chatgptSentence = Model_ChatGPT(option, sentence_entry_approach, interaction_scenario, temperature)
         self.partnerSpeech = Model_Speech_Recognition()
 
 
-    def conv_partner_speech_recognition_kwickchat(self):
+    def conv_partner_speech_recognition_chatgpt(self):
         partnerInput = self.partnerSpeech.partnerSpeechInputRecognition()
         return partnerInput
 
     def add_conv_partner_input_to_history(self, partnerInput):
-        self.historyKwickchat.append(partnerInput)
+        partnerInput = f"B: {partnerInput}"
+        self.chatgptSentence.record_conversation_history(partnerInput)
+        # self.conversation_history.append(partnerInput)
     
     def add_user_input_to_history(self, userInput):
         # when "Speak" button is clicked in KwickChat mode
-        self.historyKwickchat.append(userInput)
+        userInput = f"A: {userInput}"
+        self.chatgptSentence.record_conversation_history(userInput)
+        # self.conversation_history.append(userInput)
 
 
     def make_word_prediction(self, entry):
@@ -165,9 +170,10 @@ class Model_main:
                 if entry[-1] == ' ':
                     if 'SENTENCE_GPT2' in self.SENT_PRED_METHOD: # multiple GPT2 methods
                         predSentences = self.gpt2Sentence.generate_sentences(entry)
-                    elif self.SENT_PRED_METHOD == 'SENTENCE_KWICKCHAT':
-                        self.historyKwickchat = self.kwickchatSentence.adjust_history_size(self.historyKwickchat)
-                        predSentences = self.kwickchatSentence.generate_sentences(self.historyKwickchat, entry)
+                    elif self.SENT_PRED_METHOD == 'SENTENCE_CHATGPT':
+                        # self.historyKwickchat = self.kwickchatSentence.adjust_history_size(self.historyKwickchat)
+                        self.conversation_history = self.chatgptSentence.get_conversation_history()
+                        predSentences = self.chatgptSentence.generate_sentences(history=self.conversation_history, message=entry)
         
 
 

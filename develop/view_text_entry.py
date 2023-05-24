@@ -84,10 +84,14 @@ class View_text_edit:
                 """ Textbox has content """
                 # entryWordList = self.entry.split()
                 captionWordList = caption.split()
-                captionFirstWord = captionWordList[0]
+                captionFirstWord = captionWordList[0] + " "
                 indexOfFirstWordOfCaptionInEntry = self.entry.lower().rfind(captionFirstWord.lower())
-                self.entry = self.entry[0:indexOfFirstWordOfCaptionInEntry] + caption
-                self.entry = self.entry[0].upper() + self.entry[1:] + " "
+                if indexOfFirstWordOfCaptionInEntry == -1: 
+                    # didn't find
+                    self.entry = self.entry + caption
+                else:
+                    self.entry = self.entry[0:indexOfFirstWordOfCaptionInEntry] + caption
+                self.entry = self.entry[0].upper() + self.entry[1:] 
 
         return self.entry
 
@@ -103,7 +107,7 @@ class View_text_edit:
     def _recognize(self):
         self.controller.recognize_speech()
 
-    def pop_up_conv_partner_window_kwickchat(self):
+    def pop_up_conv_partner_window_chatgpt(self):
         self.root = tk.Tk()
         self.root.title("Speaking partner")
 
@@ -126,7 +130,7 @@ class View_text_edit:
         # self.root.mainloop() 
 
 
-    def show_conversation_partner_input_kwickchat(self, recgnisedSpeech):
+    def show_conversation_partner_input_chatgpt(self, recgnisedSpeech):
         rs = tk.StringVar(self.baseFrame, recgnisedSpeech)
         self.partnerInput.config(textvariable=rs)
         self.root.update()
@@ -137,4 +141,4 @@ class View_text_edit:
 
 if __name__ == '__main__':
     view = View_text_edit()
-    view.show_conversation_partner_input_kwickchat("How are you")
+    view.show_conversation_partner_input_chatgpt("How are you")
