@@ -11,13 +11,14 @@ class Model_Speech_Recognition:
             print("Say something!")
             self.r.adjust_for_ambient_noise(source)
             self.audio = self.r.listen(source)
+            # aduio_data = self.r.record(source, duration=5)
         result = ''
         try:
             # for testing purposes, we're just using the default API key
             # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
             # instead of `r.recognize_google(audio)`
-            result = self.r.recognize_google(self.audio)
-            print("Google Speech Recognition thinks you said " + result)
+            result = self.r.recognize_google(self.audio, language="en-GB")
+            print("Speech Recognition thinks you said: " + result)
         except sr.UnknownValueError:
             print("Google Speech Recognition could not understand audio")
             result = "Google Speech Recognition could not understand audio"

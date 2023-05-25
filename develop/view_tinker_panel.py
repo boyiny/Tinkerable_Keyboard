@@ -865,8 +865,8 @@ class View_tinker:
         
         if self.senGenMethod.get() == "ChatGPT":
             # row 2
-            self.senEntryApproach.current(0)
-            self.senEntryApproach.state(["!disabled"])
+            # self.senEntryApproach.current(0)
+            # self.senEntryApproach.state(["!disabled"])
 
             # row 5
             ttk.Label(frame, text="Interaction Scenario").grid(sticky="E", column=0, row=5)
