@@ -161,7 +161,7 @@ class View_keypad:
 
     def record_button_position(self):
         shiftCompensationX = 0 #  by calculating the shift for each shift when click On/Off of Dragable function
-        shiftCompensationY = 103 # (0, 103) is the shift compensation for Dell XPS, full screen 
+        shiftCompensationY = 93 # (0, 103) is the shift compensation for Dell XPS, full screen 
         self.buttonsAttributes = []
         for button in self.buttons:
             self.buttonsAttributes.append([button.winfo_name(), button.winfo_rootx()-shiftCompensationX, button.winfo_rooty()-shiftCompensationY, button.winfo_width(), button.winfo_height()])            
@@ -205,7 +205,7 @@ class View_keypad:
         # print("load button position")
         # print(filePath)
         shiftCompensationX = 0 #  by calculating the shift for each shift when click On/Off of Dragable function
-        shiftCompensationY = 103 # (0, 103) is the shift compensation for Dell XPS, full screen 
+        shiftCompensationY = 93 # (0, 103) is the shift compensation for Dell XPS, full screen 
 
         # read line by line 
         with open(filePath) as f:

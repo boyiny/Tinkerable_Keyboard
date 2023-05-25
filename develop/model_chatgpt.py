@@ -73,8 +73,12 @@ class Model_ChatGPT:
     def clean_generated_sentence_list(self, old_list):
         new_list = []
         for sen in old_list:
+            if '\n' in sen:
+                sen = sen[0:sen.find('\n')]
             if sen.startswith('A:') or sen.startswith('B:'):
                 sen = sen[2:].strip()
+            if 'B:' in sen and sen.startswith('B:') == False:
+                sen = sen[0:sen.find('B:')]
             sen = sen.translate({ord('_'):None})
             sen = sen.translate({ord('"'):None})
             if len(new_list) == 0:
