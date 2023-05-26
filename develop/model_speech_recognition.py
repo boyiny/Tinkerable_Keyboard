@@ -9,7 +9,7 @@ class Model_Speech_Recognition:
     def partnerSpeechInputRecognition(self):
         with sr.Microphone() as source:
             print("Say something!")
-            self.r.adjust_for_ambient_noise(source)
+            # self.r.adjust_for_ambient_noise(source)
             self.audio = self.r.listen(source)
             # aduio_data = self.r.record(source, duration=5)
         result = ''
