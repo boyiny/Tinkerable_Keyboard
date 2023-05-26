@@ -29,7 +29,7 @@ class Controller_main():
         self.viewTextEdit = View_text_edit(self)
         self.viewTinker = View_tinker(self)
         self.viewTraceAnalysis = View_trace_analysis(self)
-        # self.viewLoggingIndicator = View_logging_indicator(self, self.viewMain)
+        self.viewLoggingIndicator = View_logging_indicator(self, self.viewMain)
 
         self.speakEngine = pyttsx3.init()
         # voice = self.speakEngine.getProperty('voice')
@@ -81,6 +81,13 @@ class Controller_main():
         tts.save(filename)
         # os.system(f"start {filename}")
         # playsound(filename)
+
+    def on_log_mode_button_click(self, textLoggingIndicator):
+        if textLoggingIndicator == 'Logging typing':
+            textLoggingIndicator = 'Logging stopped'
+        else:
+            textLoggingIndicator = 'Logging typing'
+        self.viewLoggingIndicator.update_logging_indicator(textLoggingIndicator)
 
 
 

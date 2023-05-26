@@ -34,7 +34,7 @@ class View_text_box:
 
     def __init__(self, controller, rootFrame): # textBox
         self.controller = controller
-        self.entry = tk.Entry(rootFrame, textvariable=rootFrame.textBox, font=('Calibri', 18))
+        self.entry = tk.Entry(rootFrame, textvariable=rootFrame.textBox, font=('Arial', 18))
         self.entry.config(state="disabled")
         self.entry.config(disabledbackground="white")
         self.entry.config(disabledforeground="black")
@@ -48,10 +48,23 @@ class View_logging_indicator:
         self.controller = controller
         # print("The width of the window: ", rootFrame.winfo_width())
         # print("The height of the window: ", rootFrame.winfo_height())
-        self.loggingIndicatorBtn = tk.Label(self.loggingIndicatorFrame, text="Logging typing", font=('Calibri', 18))
+        self.textLoggingIndicator = 'Logging typing' 
+        # self.textLoggingIndicator.set('Logging typing')
+        command = (lambda : self.controller.on_log_mode_button_click(self.textLoggingIndicator))
+        self.loggingIndicatorBtn = tk.Button(self.loggingIndicatorFrame, command=command, text=self.textLoggingIndicator, font=('Arial', 12), fg='#302B29', bg='#E0E0E0', padx=10, pady=10)
+        
         self.loggingIndicatorBtn.place(x=10, y=0)
 
+        self.update_logging_indicator(self.textLoggingIndicator)
 
+
+    def update_logging_indicator(self, textLoggingIndicator):
+        if textLoggingIndicator == "Logging typing":
+            colour = '#302B29'
+        else:
+            colour = '#857C77'
+        self.loggingIndicatorBtn.config(text=textLoggingIndicator, fg=colour)
+        self.textLoggingIndicator = textLoggingIndicator
    
 
 class View_keypad:
@@ -497,11 +510,15 @@ class View_menu:
 
 
         traceAnalysisMenu = tk.Menu(menuBar)
-        menuBar.add_cascade(label="Trace Analysis",  menu=traceAnalysisMenu, font=('Arial', 16))
+        menuBar.add_cascade(label="Log Analysis",  menu=traceAnalysisMenu, font=('Arial', 16))
 
         traceTyping = tk.Menu(traceAnalysisMenu)
-        traceAnalysisMenu.add_cascade(label="Trace Typing", font= ('Arial', 16), menu=traceTyping)
+        traceAnalysisMenu.add_cascade(label="Log Typing", font= ('Arial', 16), menu=traceTyping)
         traceTyping.add_command(label="On", font= ('Arial', 16), command=lambda:self.controller.set_trace(True))
         traceTyping.add_command(label="Off", font= ('Arial', 16), command=lambda:self.controller.set_trace(False))
 
         traceAnalysisMenu.add_command(label="Open Trace Analysis Panel...", font= ('Arial', 16), command=lambda:self.traceView.run())
+
+       
+
+
