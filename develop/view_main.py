@@ -143,7 +143,14 @@ class View_keypad:
 
     """ General functions below """
     def load_key_size(self, keySizeDict):
-        print("In keypad view")
+        print("In keypad view: ", keySizeDict)
+        self.record_button_position_size()
+        for caption in keySizeDict.keys():
+            index = self._get_index_in_keyList(caption)
+            self.buttonsAttributes[index][-2:] = keySizeDict[caption] 
+        self._refresh_letterpad()
+
+
     
 
     def _get_index_in_keyList(self, caption):
@@ -163,7 +170,7 @@ class View_keypad:
 
 
     def _get_current_button_attribute(self, caption):
-        self.record_button_position()
+        self.record_button_position_size()
         index = self._get_index_in_keyList(caption)
         if index < len(self.buttonsAttributes):
             currentBtnAttr = self.buttonsAttributes[index]
@@ -173,14 +180,14 @@ class View_keypad:
         
         return currentBtnAttr
 
-    def record_button_position(self):
+    def record_button_position_size(self):
         shiftCompensationX = 0 #  by calculating the shift for each shift when click On/Off of Dragable function
         shiftCompensationY = 93 # (0, 103) is the shift compensation for Dell XPS, full screen 
         self.buttonsAttributes = []
         for button in self.buttons:
             self.buttonsAttributes.append([button.winfo_name(), button.winfo_rootx()-shiftCompensationX, button.winfo_rooty()-shiftCompensationY, button.winfo_width(), button.winfo_height()])            
     
-    def write_button_position(self):
+    def write_button_position_size(self):
 
         timestr = time.strftime("%Y%m%d_%H%M%S")
         fileName = "./analysis/ui_setting/key_layout_"+str(timestr)+".txt"
@@ -213,9 +220,9 @@ class View_keypad:
             # If there are previous settings (i.e. folder is not empty), load the latest one
             fileList = glob.glob('./analysis/ui_setting/*.txt')
             latestFile = max(fileList, key=os.path.getctime)
-            self._load_button_position(latestFile)
+            self._load_button_position_size(latestFile)
 
-    def _load_button_position(self, filePath):
+    def _load_button_position_size(self, filePath):
         # print("load button position")
         # print(filePath)
         shiftCompensationX = 0 #  by calculating the shift for each shift when click On/Off of Dragable function
@@ -246,7 +253,7 @@ class View_keypad:
         filePath = filedialog.askopenfilename(initialdir="/",title="Select a File", filetypes=(("Text files", "*.txt"),))
         # fileName = Path(filePath).stem
         self.controller.traceLogFile = filePath
-        self._load_button_position(filePath)
+        self._load_button_position_size(filePath)
 
     """ General functions above """
 

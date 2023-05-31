@@ -656,7 +656,7 @@ class Controller_main():
             # enable text entry and save positions
             self.save_current_keyboard_layout()
         self.viewKeypad.KEY_DRAGABLE = self.modelMain.set_drag(boolDrag)
-        self.viewKeypad.record_button_position()
+        self.viewKeypad.record_button_position_size()
         self.viewKeypad.refresh(self, self.viewMain, self.viewEntry)
 
     def set_key_size(self):
@@ -691,7 +691,7 @@ class Controller_main():
 
     """ Save current keyboard layout below """
     def save_current_keyboard_layout(self):
-        self.viewKeypad.write_button_position()
+        self.viewKeypad.write_button_position_size()
         self.viewKeypad.pop_up_layout_saved_notification()
     """ Save current keyboard layout above """
 
