@@ -26,7 +26,7 @@ class View_trace_analysis:
 
     def run(self):
         self.root = tk.Tk()
-        self.root.title("Trace Analysis")
+        self.root.title("Log Analysis")
 
         self.baseFrame = ttk.Frame(self.root)
         self.baseFrame.pack(padx=5, pady=5)

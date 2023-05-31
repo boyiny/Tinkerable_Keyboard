@@ -13,7 +13,7 @@ from pathlib import Path
 from view_text_entry import View_text_edit
 from view_tinker_panel import View_tinker
 from view_trace_analysis import View_trace_analysis
-
+from view_key_size import View_key_size
 
 
 class View_main(tk.Tk): 
@@ -73,7 +73,7 @@ class View_keypad:
     KEY_SIZE_Y = 80
     KEY_SPEAK_SIZE_X = 120
     KEY_SPEAK_SIZE_Y = 80
-    KEY_CLEAR_SIZE_X = 120
+    KEY_CLEAR_SIZE_X = 130
     KEY_CLEAR_SIZE_Y = 80
     KEY_SPACE_SIZE_X = 300
     KEY_SPACE_SIZE_Y = 80
@@ -142,6 +142,14 @@ class View_keypad:
             self._refresh_letterpad()
 
     """ General functions below """
+    def load_key_size(self, keySizeDict):
+        print("In keypad view: ", keySizeDict)
+        self.record_button_position_size()
+        for caption in keySizeDict.keys():
+            index = self._get_index_in_keyList(caption)
+            self.buttonsAttributes[index][-2:] = keySizeDict[caption] 
+        self._refresh_letterpad()
+
 
     
 
@@ -162,7 +170,7 @@ class View_keypad:
 
 
     def _get_current_button_attribute(self, caption):
-        self.record_button_position()
+        self.record_button_position_size()
         index = self._get_index_in_keyList(caption)
         if index < len(self.buttonsAttributes):
             currentBtnAttr = self.buttonsAttributes[index]
@@ -172,18 +180,18 @@ class View_keypad:
         
         return currentBtnAttr
 
-    def record_button_position(self):
+    def record_button_position_size(self):
         shiftCompensationX = 0 #  by calculating the shift for each shift when click On/Off of Dragable function
         shiftCompensationY = 93 # (0, 103) is the shift compensation for Dell XPS, full screen 
         self.buttonsAttributes = []
         for button in self.buttons:
             self.buttonsAttributes.append([button.winfo_name(), button.winfo_rootx()-shiftCompensationX, button.winfo_rooty()-shiftCompensationY, button.winfo_width(), button.winfo_height()])            
     
-    def write_button_position(self):
+    def write_button_position_size(self):
 
         timestr = time.strftime("%Y%m%d_%H%M%S")
         fileName = "./analysis/ui_setting/key_layout_"+str(timestr)+".txt"
-        f = open(fileName, "w")
+        f = open(fileName, "w+")
         for button in self.buttons:
             indexKeyList = int(button.winfo_name())
             caption = ""
@@ -212,9 +220,9 @@ class View_keypad:
             # If there are previous settings (i.e. folder is not empty), load the latest one
             fileList = glob.glob('./analysis/ui_setting/*.txt')
             latestFile = max(fileList, key=os.path.getctime)
-            self._load_button_position(latestFile)
+            self._load_button_position_size(latestFile)
 
-    def _load_button_position(self, filePath):
+    def _load_button_position_size(self, filePath):
         # print("load button position")
         # print(filePath)
         shiftCompensationX = 0 #  by calculating the shift for each shift when click On/Off of Dragable function
@@ -225,6 +233,7 @@ class View_keypad:
             lines = f.readlines()
         
         # assign to self.buttonsAttributes
+        self.buttons = []
         for line in lines:
             index = line[line.find("index: ")+len("index: ") : line.find(", caption")]
             caption = line[line.find("caption: ")+len("caption: ") : line.find(", placeX")]
@@ -244,11 +253,12 @@ class View_keypad:
         filePath = filedialog.askopenfilename(initialdir="/",title="Select a File", filetypes=(("Text files", "*.txt"),))
         # fileName = Path(filePath).stem
         self.controller.traceLogFile = filePath
-        self._load_button_position(filePath)
+        self._load_button_position_size(filePath)
 
     """ General functions above """
 
-
+    # def run_key_size_panel(self):
+    #     print("Running key size panel")
     
 
 
@@ -380,6 +390,7 @@ class View_keypad:
     def make_letterpad(self):
         
         keyIndex = 0
+        self.buttons = []
 
         for row in range(len(self.keyList)):
             
@@ -472,6 +483,7 @@ class View_menu:
         self._make_menu()
         self.tinkerView = View_tinker(self.controller)
         self.traceView = View_trace_analysis(self.controller)
+        # self.keySizeView = View_key_size(self.controller, keypadView)
 
 
     def _make_menu(self):
@@ -496,15 +508,18 @@ class View_menu:
         moveElementMenu.add_command(label="On", font= ('Arial', 16), command=lambda:self.controller.set_drag(True))
         moveElementMenu.add_command(label="Off", font= ('Arial', 16), command=lambda:self.controller.set_drag(False))
 
+        
+        uiControlMenu.add_command(label="Change the Key Size...", font=('Arial', 16), command=lambda:self.controller.set_key_size())
+        
         # uiControlMenu.add_command(label="Change the Button Size", command=lambda:self.controller.set_btn_size())
         uiControlMenu.add_command(label="Default Layout", font= ('Arial', 16), command=lambda:self.controller.load_default_layout())
         uiControlMenu.add_command(label="Save the Current Layout", font= ('Arial', 16), command=lambda:self.controller.save_current_keyboard_layout())
         uiControlMenu.add_command(label="Load Previous Layout...", font= ('Arial', 16), command=lambda:self.controller.load_previous_keyboard_layout())
 
         tinkerMenu = tk.Menu(menuBar)
-        menuBar.add_cascade(label="Tinker", menu=tinkerMenu, font=('Arial', 16))
+        menuBar.add_cascade(label="Predictions", menu=tinkerMenu, font=('Arial', 16))
         tinkerMenu.add_command(label="Default Prediction Setting", font= ('Arial', 16), command=lambda:self.tinkerView.default_setting())
-        tinkerMenu.add_command(label="Open Tinker Panel...", font= ('Arial', 16), command=lambda:self.tinkerView.run())
+        tinkerMenu.add_command(label="Open the Prediction Setting Panel...", font= ('Arial', 16), command=lambda:self.tinkerView.run())
         tinkerMenu.add_command(label="Save Current Prediction Settings", font= ('Arial', 16), command=lambda:self.controller.save_current_prediction_settings())
         tinkerMenu.add_command(label="Load Previous Prediction Settings...", font= ('Arial', 16), command=lambda:self.controller.load_previous_prediction_settings())
 

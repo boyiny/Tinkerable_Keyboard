@@ -6,8 +6,9 @@ from model_main import Model_main
 from view_main import View_main, View_menu, View_text_box, View_keypad, View_logging_indicator
 from view_tinker_panel import View_tinker
 from view_text_entry import View_text_edit
+from view_key_size import View_key_size
 import pyttsx3
-from gtts import gTTS
+# from gtts import gTTS
 
 import configparser 
 import os
@@ -30,6 +31,7 @@ class Controller_main():
         self.viewTinker = View_tinker(self)
         self.viewTraceAnalysis = View_trace_analysis(self)
         self.viewLoggingIndicator = View_logging_indicator(self, self.viewMain)
+        self.viewKeySize = View_key_size(self, self.viewKeypad)
 
         self.speakEngine = pyttsx3.init()
         # voice = self.speakEngine.getProperty('voice')
@@ -75,12 +77,12 @@ class Controller_main():
         self.auto_load_the_latest_prediction_settings()
         self.auto_load_the_latest_ui_settings()
         
-    def text_to_speech(self, text):
-        tts = gTTS(text=text, lang='en')
-        filename = "speak.mp3"
-        tts.save(filename)
-        # os.system(f"start {filename}")
-        # playsound(filename)
+    # def text_to_speech(self, text):
+    #     tts = gTTS(text=text, lang='en')
+    #     filename = "speak.mp3"
+    #     tts.save(filename)
+    #     # os.system(f"start {filename}")
+    #     # playsound(filename)
 
     def on_log_mode_button_click(self, textLoggingIndicator):
         if textLoggingIndicator == 'Logging typing':
@@ -643,7 +645,7 @@ class Controller_main():
     """ Word and Sentence Prediction Above """
 
 
-    """ Set dragable keys below """
+    """ UI control below """
     
     def set_drag(self, boolDrag):
         self.boolDrag = boolDrag
@@ -654,12 +656,15 @@ class Controller_main():
             # enable text entry and save positions
             self.save_current_keyboard_layout()
         self.viewKeypad.KEY_DRAGABLE = self.modelMain.set_drag(boolDrag)
-        self.viewKeypad.record_button_position()
+        self.viewKeypad.record_button_position_size()
         self.viewKeypad.refresh(self, self.viewMain, self.viewEntry)
+
+    def set_key_size(self):
+        self.viewKeySize.run()
+        keySizeDict = self.viewKeySize.get_key_size_dict()
         
 
-
-    """ Set dragable keys above """
+    """ UI control above """
 
     """ Save current prediction settings below """
     def save_current_prediction_settings(self):
@@ -686,7 +691,7 @@ class Controller_main():
 
     """ Save current keyboard layout below """
     def save_current_keyboard_layout(self):
-        self.viewKeypad.write_button_position()
+        self.viewKeypad.write_button_position_size()
         self.viewKeypad.pop_up_layout_saved_notification()
     """ Save current keyboard layout above """
 
