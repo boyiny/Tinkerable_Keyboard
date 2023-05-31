@@ -330,13 +330,15 @@ class Controller_main():
         self.viewTextEdit.show_conversation_partner_input_chatgpt(partnerInput)
         
     def add_conv_partner_input_to_history(self, editedPartnerInput):
-        self.modelMain.add_conv_partner_input_to_history(editedPartnerInput)
+        self.modelMain.add_conv_partner_input_to_history_for_dialogue(editedPartnerInput)
 
-    def add_user_input_to_history(self, editedUserInput):
+    def add_user_input_to_history_for_chatgpt(self, editedUserInput):
         # when 'Speak' btn is clicked
-        self.modelMain.add_user_input_to_history(editedUserInput)
+        self.modelMain.add_user_input_to_history_for_chatgpt(editedUserInput)
         # self.modelLogData.record_conversation_partner_input(editedUserInput)
-
+    
+    def add_user_input_to_history_for_retrieval(self, userInput):
+        self.modelMain.add_user_input_to_history_for_retrieval(userInput)
     
     """ ChatGPT interaction above """
 
@@ -355,8 +357,6 @@ class Controller_main():
             self.currentPressedKey = caption
             text = self.viewTextEdit.edit_text_letter(caption) 
             self.viewMain.textBox.set(text)
-
-        
 
         predWords = []
         predSentences = []
@@ -410,19 +410,46 @@ class Controller_main():
 
             else:
                 self.viewKeypad.clear_placed_sentences()
-        
-        # Collcet user input as conversation history
-        if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
-            if caption == 'Speak':
-                self.add_user_input_to_history(entry) 
-                if self.interaction_scenario_CHATGPT == 'Dialogue':
-                    self.pop_up_conv_partner_window_chatgpt()
-                # self.modelLogData.recored_sentence_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, finishedSen=entry)
-
+  
         # Trace record
         if self.boolTrace == True:
             self.modelTraceAnalysis.record_pressed_button(caption='key: '+caption, wordPred=predWords, senPred=predSentences, currentSen=entry)
-        
+    
+    def on_speak_button_click(self, entry):
+        # Collcet user input as conversation history for ChatGPT
+        if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
+            if entry != '':
+                self.add_user_input_to_history_for_chatgpt(entry) 
+                if self.interaction_scenario_CHATGPT == 'Dialogue':
+                    self.pop_up_conv_partner_window_chatgpt()
+                # self.modelLogData.recored_sentence_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, finishedSen=entry)
+        else:
+            if entry != '':
+                self.add_user_input_to_history_for_retrieval(entry)
+        # re_load retrieval function
+        if self.word_pred_PREDICTION_TASK == "WORD_BM25OKAPI": # "BM25L", "BM25Plus", "GPT-2", "RoBERTa"
+            option = "BM25OKAPI"
+            self.modelMain.load_bm25_word(option, self.k1_WORD_BM25OKAPI, self.b_WORD_BM25OKAPI, epsilon=self.epsilon_WORD_BM25OKAPI)
+        elif self.word_pred_PREDICTION_TASK == "WORD_BM25L":
+            option = "BM25L"
+            self.modelMain.load_bm25_word(option, self.k1_WORD_BM25L, self.b_WORD_BM25L, delta=self.delta_WORD_BM25L)
+        elif self.word_pred_PREDICTION_TASK == "WORD_BM25PLUS":
+            option = "BM25PLUS"
+            self.modelMain.load_bm25_word(option, self.k1_WORD_BM25PLUS, self.b_WORD_BM25PLUS, delta=self.delta_WORD_BM25PLUS)
+
+        if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25OKAPI':
+            option = 'BM25OKAPI'
+            self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25OKAPI, self.b_SENTENCE_BM25OKAPI, epsilon=self.epsilon_SENTENCE_BM25OKAPI)
+        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25L':
+            option = 'BM25L'
+            self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25L, self.b_SENTENCE_BM25L, delta=self.delta_SENTENCE_BM25L)
+        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25PLUS':
+            option = 'BM25PLUS'
+            self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25PLUS, self.b_SENTENCE_BM25PLUS, delta=self.delta_SENTENCE_BM25PLUS)
+        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_SEMANTIC_SIMILARITY':
+            option = 'SEMANTIC_SIMILARITY'
+            self.modelMain.load_semantic_sen_retrieval_sentence(model=self.sen_retri_seman_model_SENTENCE_SEMANTIC_SIMILARITY)
+
             
     def on_predicted_word_button_click(self, entry):
         """ Present selected pred word on textbox """

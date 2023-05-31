@@ -1,5 +1,6 @@
 import threading
 from os import system
+import os
 from model_fill_word import Model_Fill_Word
 from model_bm25 import Model_Bm25
 from model_gpt2 import Model_Gpt2
@@ -105,16 +106,41 @@ class Model_main:
         partnerInput = self.partnerSpeech.partnerSpeechInputRecognition()
         return partnerInput
 
-    def add_conv_partner_input_to_history(self, partnerInput):
+    def add_conv_partner_input_to_history_for_dialogue(self, partnerInput):
         partnerInput = f"B: {partnerInput}"
         self.chatgptSentence.record_conversation_history(partnerInput)
         # self.conversation_history.append(partnerInput)
+        # TODO: Add to word prediction dataset
+        txt_path = './Dataset/sent_train_aac.txt'
+        txt_path = os.path.join(os.path.dirname(__file__), txt_path)
+        with open(txt_path, 'a') as file:
+            file.write(partnerInput)
+        file.close()
+
     
-    def add_user_input_to_history(self, userInput):
-        # when "Speak" button is clicked in KwickChat mode
+    def add_user_input_to_history_for_chatgpt(self, userInput):
+        # when "Speak" button is clicked in KwickChat/chatgpt mode
+        userInput = userInput.strip()
         userInput = f"A: {userInput}"
         self.chatgptSentence.record_conversation_history(userInput)
-        # self.conversation_history.append(userInput)
+        
+        # Add to word prediction dataset
+        userInput = userInput + '\n'
+        txt_path = './Dataset/sent_train_aac.txt'
+        txt_path = os.path.join(os.path.dirname(__file__), txt_path)
+        with open(txt_path, 'a') as file:
+            file.write(userInput)
+        file.close()
+
+    def add_user_input_to_history_for_retrieval(self, userInput):
+        # when "Speak" button is clicked, except chatgpt mode
+        userInput = userInput.strip()
+        userInput = userInput + '\n'
+        txt_path = './Dataset/sent_train_aac.txt'
+        txt_path = os.path.join(os.path.dirname(__file__), txt_path)
+        with open(txt_path, 'a') as file:
+            file.write(userInput)
+        file.close()
 
 
     def make_word_prediction(self, entry):

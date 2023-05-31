@@ -24,6 +24,7 @@ class View_text_edit:
         elif caption == "Speak":
             # system(f'say {self.entry}')
             self.controller.speak_text(self.entry)
+            self.controller.on_speak_button_click(self.entry)
             self.entry = ''
         elif caption == "Clear All":
             self.entry = ''
