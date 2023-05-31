@@ -18,7 +18,7 @@ class Model_Bm25:
     b_BM25PLUS = 0.75
     delta_BM25PLUS = 1.0
 
-    def __init__(self, option, k1, b, epsilon=None, delta=None, boolEntryByKeywords=None):
+    def __init__(self, option='BM25Okapi', k1=1.5, b=0.75, epsilon=None, delta=None, boolEntryByKeywords=None):
         # print(f"In model_bm25, option = {option}, boolEntryByKeywords = {boolEntryByKeywords} k1 = {k1}, b = {b}, epsilon = {epsilon}, delta = {delta}.")
         if option != None:
             self.BM25_OPTION = option
