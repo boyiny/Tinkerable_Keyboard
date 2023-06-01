@@ -122,24 +122,25 @@ class Controller_main():
         self.b_WORD_BM25OKAPI            = float(self.config['WORD_BM25OKAPI']['b'])
         self.epsilon_WORD_BM25OKAPI      = float(self.config['WORD_BM25OKAPI']['epsilon'])
 
-        self.k1_WORD_BM25L              = float(self.config['WORD_BM25L']['k1'])
-        self.b_WORD_BM25L               = float(self.config['WORD_BM25L']['b'])
-        self.delta_WORD_BM25L           = float(self.config['WORD_BM25L']['delta'])
+        self.temperature_WORD_CHATGPT   = float(self.config['WORD_CHATGPT']['temperature'])
+        
+        # self.b_WORD_BM25L               = float(self.config['WORD_BM25L']['b'])
+        # self.delta_WORD_BM25L           = float(self.config['WORD_BM25L']['delta'])
 
-        self.k1_WORD_BM25PLUS           = float(self.config['WORD_BM25PLUS']['k1'])
-        self.b_WORD_BM25PLUS            = float(self.config['WORD_BM25PLUS']['b'])
-        self.delta_WORD_BM25PLUS        = float(self.config['WORD_BM25PLUS']['delta'])
+        # self.k1_WORD_BM25PLUS           = float(self.config['WORD_BM25PLUS']['k1'])
+        # self.b_WORD_BM25PLUS            = float(self.config['WORD_BM25PLUS']['b'])
+        # self.delta_WORD_BM25PLUS        = float(self.config['WORD_BM25PLUS']['delta'])
 
-        self.model_WORD_GPT2            = str(self.config['WORD_GPT2']['model'])
-        self.seed_WORD_GPT2             = int(self.config['WORD_GPT2']['seed'])
+        # self.model_WORD_GPT2            = str(self.config['WORD_GPT2']['model'])
+        # self.seed_WORD_GPT2             = int(self.config['WORD_GPT2']['seed'])
 
-        self.model_WORD_ROBERTA         = str(self.config['WORD_ROBERTA']['model'])
+        # self.model_WORD_ROBERTA         = str(self.config['WORD_ROBERTA']['model'])
 
         self.max_pred_num_SENTENCE_PREDICTION               = int(self.config['SENTENCE_PREDICTION']['max_pred_num'])
         self.sentence_entry_approach_SENTENCE_PREDICTION    = str(self.config['SENTENCE_PREDICTION']['sentence_entry_approach'])
         self.prediction_approach_SENTENCE_PREDICTION        = str(self.config['SENTENCE_PREDICTION']['prediction_approach'])
 
-        self.similarity_SENTENCE_RETRIEVAL                  = str(self.config['SENTENCE_RETRIEVAL']['similarity'])
+        self.similarity_SENTENCE_RETRIEVAL                  = str(self.config['SENTENCE_RETRIEVAL']['method'])
 
         self.retri_method_SENTENCE_TEXT_SIMILARITY          = str(self.config['SENTENCE_TEXT_SIMILARITY']['retri_method'])
 
@@ -147,36 +148,36 @@ class Controller_main():
         self.b_SENTENCE_BM25OKAPI        = float(self.config['SENTENCE_BM25OKAPI']['b'])
         self.epsilon_SENTENCE_BM25OKAPI  = float(self.config['SENTENCE_BM25OKAPI']['epsilon'])
 
-        self.k1_SENTENCE_BM25L          = float(self.config['SENTENCE_BM25L']['k1'])
-        self.b_SENTENCE_BM25L           = float(self.config['SENTENCE_BM25L']['b'])
-        self.delta_SENTENCE_BM25L       = float(self.config['SENTENCE_BM25L']['delta'])
+        # self.k1_SENTENCE_BM25L          = float(self.config['SENTENCE_BM25L']['k1'])
+        # self.b_SENTENCE_BM25L           = float(self.config['SENTENCE_BM25L']['b'])
+        # self.delta_SENTENCE_BM25L       = float(self.config['SENTENCE_BM25L']['delta'])
 
-        self.k1_SENTENCE_BM25PLUS       = float(self.config['SENTENCE_BM25PLUS']['k1'])
-        self.b_SENTENCE_BM25PLUS        = float(self.config['SENTENCE_BM25PLUS']['b'])
-        self.delta_SENTENCE_BM25PLUS    = float(self.config['SENTENCE_BM25PLUS']['delta'])
+        # self.k1_SENTENCE_BM25PLUS       = float(self.config['SENTENCE_BM25PLUS']['k1'])
+        # self.b_SENTENCE_BM25PLUS        = float(self.config['SENTENCE_BM25PLUS']['b'])
+        # self.delta_SENTENCE_BM25PLUS    = float(self.config['SENTENCE_BM25PLUS']['delta'])
 
         self.sen_retri_seman_model_SENTENCE_SEMANTIC_SIMILARITY = str(self.config['SENTENCE_SEMANTIC_SIMILARITY']['sen_retri_seman_model'])
 
         self.method_SENTENCE_GENERATION                         = str(self.config['SENTENCE_GENERATION']['method'])
 
-        self.model_SENTENCE_GPT2                                = str(self.config['SENTENCE_GPT2']['model'])
-        self.method_SENTENCE_GPT2                               = str(self.config['SENTENCE_GPT2']['method'])
+        # self.model_SENTENCE_GPT2                                = str(self.config['SENTENCE_GPT2']['model'])
+        # self.method_SENTENCE_GPT2                               = str(self.config['SENTENCE_GPT2']['method'])
 
-        self.max_length_SENTENCE_GPT2_GREEDY                = int(self.config['SENTENCE_GPT2_GREEDY']['max_length'])
-        self.no_repeat_n_gram_size_SENTENCE_GPT2_GREEDY     = int(self.config['SENTENCE_GPT2_GREEDY']['no_repeat_n_gram_size'])
+        # self.max_length_SENTENCE_GPT2_GREEDY                = int(self.config['SENTENCE_GPT2_GREEDY']['max_length'])
+        # self.no_repeat_n_gram_size_SENTENCE_GPT2_GREEDY     = int(self.config['SENTENCE_GPT2_GREEDY']['no_repeat_n_gram_size'])
 
-        self.max_length_SENTENCE_GPT2_BEAM                  = int(self.config['SENTENCE_GPT2_BEAM']['max_length'])
-        self.no_repeat_n_gram_size_SENTENCE_GPT2_BEAM       = int(self.config['SENTENCE_GPT2_BEAM']['no_repeat_n_gram_size'])
-        self.num_of_beams_SENTENCE_GPT2_BEAM                = int(self.config['SENTENCE_GPT2_BEAM']['num_of_beams'])
+        # self.max_length_SENTENCE_GPT2_BEAM                  = int(self.config['SENTENCE_GPT2_BEAM']['max_length'])
+        # self.no_repeat_n_gram_size_SENTENCE_GPT2_BEAM       = int(self.config['SENTENCE_GPT2_BEAM']['no_repeat_n_gram_size'])
+        # self.num_of_beams_SENTENCE_GPT2_BEAM                = int(self.config['SENTENCE_GPT2_BEAM']['num_of_beams'])
 
-        self.max_length_SENTENCE_GPT2_TOP_K                 = int(self.config['SENTENCE_GPT2_TOP_K']['max_length'])
-        self.seed_SENTENCE_GPT2_TOP_K                       = int(self.config['SENTENCE_GPT2_TOP_K']['seed'])
-        self.top_k_SENTENCE_GPT2_TOP_K                      = int(self.config['SENTENCE_GPT2_TOP_K']['top_k'])
+        # self.max_length_SENTENCE_GPT2_TOP_K                 = int(self.config['SENTENCE_GPT2_TOP_K']['max_length'])
+        # self.seed_SENTENCE_GPT2_TOP_K                       = int(self.config['SENTENCE_GPT2_TOP_K']['seed'])
+        # self.top_k_SENTENCE_GPT2_TOP_K                      = int(self.config['SENTENCE_GPT2_TOP_K']['top_k'])
 
-        self.max_length_SENTENCE_GPT2_TOP_P                 = int(self.config['SENTENCE_GPT2_TOP_P']['max_length'])
-        self.seed_SENTENCE_GPT2_TOP_P                       = int(self.config['SENTENCE_GPT2_TOP_P']['seed'])
-        self.top_k_SENTENCE_GPT2_TOP_P                      = int(self.config['SENTENCE_GPT2_TOP_P']['top_k'])
-        self.top_p_SENTENCE_GPT2_TOP_P                      = float(self.config['SENTENCE_GPT2_TOP_P']['top_p'])
+        # self.max_length_SENTENCE_GPT2_TOP_P                 = int(self.config['SENTENCE_GPT2_TOP_P']['max_length'])
+        # self.seed_SENTENCE_GPT2_TOP_P                       = int(self.config['SENTENCE_GPT2_TOP_P']['seed'])
+        # self.top_k_SENTENCE_GPT2_TOP_P                      = int(self.config['SENTENCE_GPT2_TOP_P']['top_k'])
+        # self.top_p_SENTENCE_GPT2_TOP_P                      = float(self.config['SENTENCE_GPT2_TOP_P']['top_p'])
 
         self.temperature_SENTENCE_CHATGPT             = float(self.config['SENTENCE_CHATGPT']['temperature'])
         self.interaction_scenario_CHATGPT             = str(self.config['SENTENCE_CHATGPT']['scenario'])
