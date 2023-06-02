@@ -106,6 +106,7 @@ class Controller_main():
         else:
             self.boolWordPredDisplay = True
             print(f"word pred task: {self.word_pred_PREDICTION_TASK}")
+        
         self.sentence_pred_PREDICTION_TASK      = self.config['PREDICTION_TASK']['sentence_pred']
         if self.sentence_pred_PREDICTION_TASK == '':
             self.boolSentencePredDisplay = False
@@ -139,66 +140,21 @@ class Controller_main():
         self.max_pred_num_SENTENCE_PREDICTION               = int(self.config['SENTENCE_PREDICTION']['max_pred_num'])
         self.sentence_entry_approach_SENTENCE_PREDICTION    = str(self.config['SENTENCE_PREDICTION']['sentence_entry_approach'])
         self.prediction_approach_SENTENCE_PREDICTION        = str(self.config['SENTENCE_PREDICTION']['prediction_approach'])
-
         self.similarity_SENTENCE_RETRIEVAL                  = str(self.config['SENTENCE_RETRIEVAL']['method'])
-
         self.retri_method_SENTENCE_TEXT_SIMILARITY          = str(self.config['SENTENCE_TEXT_SIMILARITY']['retri_method'])
 
         self.k1_SENTENCE_BM25OKAPI       = float(self.config['SENTENCE_BM25OKAPI']['k1'])
         self.b_SENTENCE_BM25OKAPI        = float(self.config['SENTENCE_BM25OKAPI']['b'])
         self.epsilon_SENTENCE_BM25OKAPI  = float(self.config['SENTENCE_BM25OKAPI']['epsilon'])
 
-        # self.k1_SENTENCE_BM25L          = float(self.config['SENTENCE_BM25L']['k1'])
-        # self.b_SENTENCE_BM25L           = float(self.config['SENTENCE_BM25L']['b'])
-        # self.delta_SENTENCE_BM25L       = float(self.config['SENTENCE_BM25L']['delta'])
-
-        # self.k1_SENTENCE_BM25PLUS       = float(self.config['SENTENCE_BM25PLUS']['k1'])
-        # self.b_SENTENCE_BM25PLUS        = float(self.config['SENTENCE_BM25PLUS']['b'])
-        # self.delta_SENTENCE_BM25PLUS    = float(self.config['SENTENCE_BM25PLUS']['delta'])
 
         self.sen_retri_seman_model_SENTENCE_SEMANTIC_SIMILARITY = str(self.config['SENTENCE_SEMANTIC_SIMILARITY']['sen_retri_seman_model'])
-
         self.method_SENTENCE_GENERATION                         = str(self.config['SENTENCE_GENERATION']['method'])
 
-        # self.model_SENTENCE_GPT2                                = str(self.config['SENTENCE_GPT2']['model'])
-        # self.method_SENTENCE_GPT2                               = str(self.config['SENTENCE_GPT2']['method'])
-
-        # self.max_length_SENTENCE_GPT2_GREEDY                = int(self.config['SENTENCE_GPT2_GREEDY']['max_length'])
-        # self.no_repeat_n_gram_size_SENTENCE_GPT2_GREEDY     = int(self.config['SENTENCE_GPT2_GREEDY']['no_repeat_n_gram_size'])
-
-        # self.max_length_SENTENCE_GPT2_BEAM                  = int(self.config['SENTENCE_GPT2_BEAM']['max_length'])
-        # self.no_repeat_n_gram_size_SENTENCE_GPT2_BEAM       = int(self.config['SENTENCE_GPT2_BEAM']['no_repeat_n_gram_size'])
-        # self.num_of_beams_SENTENCE_GPT2_BEAM                = int(self.config['SENTENCE_GPT2_BEAM']['num_of_beams'])
-
-        # self.max_length_SENTENCE_GPT2_TOP_K                 = int(self.config['SENTENCE_GPT2_TOP_K']['max_length'])
-        # self.seed_SENTENCE_GPT2_TOP_K                       = int(self.config['SENTENCE_GPT2_TOP_K']['seed'])
-        # self.top_k_SENTENCE_GPT2_TOP_K                      = int(self.config['SENTENCE_GPT2_TOP_K']['top_k'])
-
-        # self.max_length_SENTENCE_GPT2_TOP_P                 = int(self.config['SENTENCE_GPT2_TOP_P']['max_length'])
-        # self.seed_SENTENCE_GPT2_TOP_P                       = int(self.config['SENTENCE_GPT2_TOP_P']['seed'])
-        # self.top_k_SENTENCE_GPT2_TOP_P                      = int(self.config['SENTENCE_GPT2_TOP_P']['top_k'])
-        # self.top_p_SENTENCE_GPT2_TOP_P                      = float(self.config['SENTENCE_GPT2_TOP_P']['top_p'])
-
         self.temperature_SENTENCE_CHATGPT             = float(self.config['SENTENCE_CHATGPT']['temperature'])
-        self.interaction_scenario_CHATGPT             = str(self.config['SENTENCE_CHATGPT']['scenario'])
-
-        # self.max_length_SENTENCE_KWICKCHAT          = int(self.config['SENTENCE_KWICKCHAT']['max_length'])
-        # self.min_length_SENTENCE_KWICKCHAT          = int(self.config['SENTENCE_KWICKCHAT']['min_length'])
-        # self.seed_SENTENCE_KWICKCHAT                = int(self.config['SENTENCE_KWICKCHAT']['seed'])
-        # self.temperature_SENTENCE_KWICKCHAT         = float(self.config['SENTENCE_KWICKCHAT']['temperature'])
-        # self.top_k_SENTENCE_KWICKCHAT               = int(self.config['SENTENCE_KWICKCHAT']['top_k'])
-        # self.top_p_SENTENCE_KWICKCHAT               = float(self.config['SENTENCE_KWICKCHAT']['top_p'])
-        # self.num_of_history_SENTENCE_KWICKCHAT      = int(self.config['SENTENCE_KWICKCHAT']['num_of_history'])
-        # self.num_of_persona_SENTENCE_KWICKCHAT      = int(self.config['SENTENCE_KWICKCHAT']['num_of_persona'])
-        # self.persona_SENTENCE_KWICKCHAT             = str(self.config['SENTENCE_KWICKCHAT']['persona']).split('|')
-        # print(f"Persona list: {self.persona_SENTENCE_KWICKCHAT}")
+        self.interaction_scenario_SENTENCE_CHATGPT    = str(self.config['SENTENCE_CHATGPT']['scenario'])
 
         self.assign_task()
-
-        # if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_KWICKCHAT':
-        #     self.conversation_partner_input_kwickchat()
-            
-
 
     """ Tinker Panel responses below """
 
@@ -217,7 +173,8 @@ class Controller_main():
                 """ Finished a word """
                 self._make_word_prediction(entry)
                 """ Log the word level text entry """
-                self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, currentSen = entry)
+                if self.boolTrace:
+                    self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, scenario=self.interaction_scenario_SENTENCE_CHATGPT, currentSen = entry)
 
             else:
                 """ Typing a word """
@@ -245,8 +202,9 @@ class Controller_main():
             self.modelMain.load_bm25_word(option, self.k1_WORD_BM25PLUS, self.b_WORD_BM25PLUS, delta=self.delta_WORD_BM25PLUS)
         elif self.word_pred_PREDICTION_TASK == "WORD_GPT2":
             self.modelMain.load_gpt2_word(option=self.word_pred_PREDICTION_TASK, model=self.model_WORD_GPT2, seed=self.seed_WORD_GPT2)
-        elif self.word_pred_PREDICTION_TASK == "WORD_ROBERTA":
-            self.modelMain.load_roberta_word(option=self.word_pred_PREDICTION_TASK, model=self.model_WORD_ROBERTA)
+        elif self.word_pred_PREDICTION_TASK == "CHATGPT":
+            option = "CHATGPT"
+            self.modelMain.load_chatgpt(option, self.word_pred_PREDICTION_TASK, "WORD_PRED", self.temperature_SENTENCE_CHATGPT) 
 
 
     def _sentence_prediction_settings(self):
@@ -273,33 +231,9 @@ class Controller_main():
         if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25OKAPI':
             option = 'BM25OKAPI'
             self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25OKAPI, self.b_SENTENCE_BM25OKAPI, epsilon=self.epsilon_SENTENCE_BM25OKAPI)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25L':
-            option = 'BM25L'
-            self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25L, self.b_SENTENCE_BM25L, delta=self.delta_SENTENCE_BM25L)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25PLUS':
-            option = 'BM25PLUS'
-            self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25PLUS, self.b_SENTENCE_BM25PLUS, delta=self.delta_SENTENCE_BM25PLUS)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_SEMANTIC_SIMILARITY':
-            option = 'SEMANTIC_SIMILARITY'
-            self.modelMain.load_semantic_sen_retrieval_sentence(model=self.sen_retri_seman_model_SENTENCE_SEMANTIC_SIMILARITY)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_GPT2_GREEDY':
-            method = 'GPT2_GREEDY'
-            self.modelMain.load_gpt2_sentence(option=self.sentence_pred_PREDICTION_TASK, model=self.model_SENTENCE_GPT2, method=method, max_length=self.max_length_SENTENCE_GPT2_GREEDY, no_repeat_ngram_size=self.no_repeat_n_gram_size_SENTENCE_GPT2_GREEDY)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_GPT2_BEAM':
-            method = 'GPT2_BEAM'
-            self.modelMain.load_gpt2_sentence(option=self.sentence_pred_PREDICTION_TASK, model=self.model_SENTENCE_GPT2, method=method, max_length=self.max_length_SENTENCE_GPT2_BEAM, no_repeat_ngram_size=self.no_repeat_n_gram_size_SENTENCE_GPT2_BEAM, num_of_beams=self.num_of_beams_SENTENCE_GPT2_BEAM)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_GPT2_TOP_K':
-            method = 'GPT2_TOP_K'
-            self.modelMain.load_gpt2_sentence(option=self.sentence_pred_PREDICTION_TASK, model=self.model_SENTENCE_GPT2, method=method, max_length=self.max_length_SENTENCE_GPT2_TOP_K, seed=self.seed_SENTENCE_GPT2_TOP_K, top_k=self.top_k_SENTENCE_GPT2_TOP_K)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_GPT2_TOP_P':
-            method = 'GPT2_TOP_P'
-            self.modelMain.load_gpt2_sentence(option=self.sentence_pred_PREDICTION_TASK, model=self.model_SENTENCE_GPT2, method=method, max_length=self.max_length_SENTENCE_GPT2_TOP_P, seed=self.seed_SENTENCE_GPT2_TOP_P, top_k=self.top_k_SENTENCE_GPT2_TOP_P, top_p=self.top_p_SENTENCE_GPT2_TOP_P)
-        # elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_KWICKCHAT':
-        #     option = 'KWICKCHAT'
-        #     self.modelMain.load_kwickchat_sentence(option=self.sentence_pred_PREDICTION_TASK, max_length=self.max_length_SENTENCE_KWICKCHAT, min_length=self.min_length_SENTENCE_KWICKCHAT, seed=self.seed_SENTENCE_KWICKCHAT, temperature=self.temperature_SENTENCE_KWICKCHAT, top_k=self.top_k_SENTENCE_KWICKCHAT, top_p=self.top_p_SENTENCE_KWICKCHAT, num_of_history_exchanges=self.num_of_history_SENTENCE_KWICKCHAT, persona=self.persona_SENTENCE_KWICKCHAT)
         elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
             option = 'CHATGPT'
-            self.modelMain.load_chatgpt(option, self.sentence_entry_approach_SENTENCE_PREDICTION, self.interaction_scenario_CHATGPT, self.temperature_SENTENCE_CHATGPT) 
+            self.modelMain.load_chatgpt(option, self.sentence_entry_approach_SENTENCE_PREDICTION, self.interaction_scenario_SENTENCE_CHATGPT, self.temperature_SENTENCE_CHATGPT) 
 
         # make the initial pred if there is entered text
         if self.sentence_pred_PREDICTION_TASK == '':
@@ -329,14 +263,18 @@ class Controller_main():
     def recognize_speech(self):
         partnerInput = self.modelMain.conv_partner_speech_recognition_chatgpt()
         self.viewTextEdit.show_conversation_partner_input_chatgpt(partnerInput)
-        
+        # record 
+                
     def add_conv_partner_input_to_history(self, editedPartnerInput):
         self.modelMain.add_conv_partner_input_to_history_for_dialogue(editedPartnerInput)
+        """ record conversation partner input """
+        if self.boolTrace:
+            self.modelLogData.record_conversation_partner_input(editedPartnerInput)
 
     def add_user_input_to_history_for_chatgpt(self, editedUserInput):
         # when 'Speak' btn is clicked
         self.modelMain.add_user_input_to_history_for_chatgpt(editedUserInput)
-        # self.modelLogData.record_conversation_partner_input(editedUserInput)
+        
     
     def add_user_input_to_history_for_retrieval(self, userInput):
         self.modelMain.add_user_input_to_history_for_retrieval(userInput)
@@ -385,7 +323,8 @@ class Controller_main():
                 # self._make_word_fill(entry)
                 predWords = self._make_word_prediction(entry)
                 """ Log the word level text entry """
-                self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, currentSen = entry)
+                if self.boolTrace:
+                    self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, scenario=self.interaction_scenario_SENTENCE_CHATGPT, currentSen = entry)
 
             else:
                 self.viewKeypad.clear_placed_words()
@@ -421,7 +360,7 @@ class Controller_main():
         if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
             if entry != '':
                 self.add_user_input_to_history_for_chatgpt(entry) 
-                if self.interaction_scenario_CHATGPT == 'Dialogue':
+                if self.interaction_scenario_SENTENCE_CHATGPT == 'Dialogue':
                     self.pop_up_conv_partner_window_chatgpt()
                 # self.modelLogData.recored_sentence_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, finishedSen=entry)
         else:
@@ -642,7 +581,8 @@ class Controller_main():
             """ Finished a word """
             predWords = self._make_word_prediction(entry)
             """ Log the word level text entry """
-            self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, currentSen = entry)
+            if self.boolTrace:
+                self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, scenario=self.interaction_scenario_SENTENCE_CHATGPT, currentSen = entry)
         else:
             """ Typing a word """
             predWords = self._make_word_fill(entry)
@@ -759,8 +699,10 @@ class Controller_main():
     """ Speak below """
     # a sentence is finished
     def speak_text(self, text):
-        self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, currentSen = text)
-        self.modelLogData.record_sentence_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, finishedSen=text)
+        """ log word and sentence level entry """
+        if self.boolTrace:
+            self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, scenario=self.interaction_scenario_SENTENCE_CHATGPT, currentSen = text)
+            self.modelLogData.record_sentence_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, scenario=self.interaction_scenario_SENTENCE_CHATGPT, finishedSen=text)
         # self.text_to_speech(text)
         self.speakEngine.say(text)
         self.speakEngine.runAndWait()

@@ -5027,3 +5027,8 @@ How are you doing
 Stella
 Of course
 Of course
+A: Hello there!
+B: hiA: Do you have plans for the weekend?
+A: Hello there!
+B: Hi, how are you?A: I am doing well, do you have any plans for the weekend?
+B: I plan to go fishingA: Where do you plan to go fishing?

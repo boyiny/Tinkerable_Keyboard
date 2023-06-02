@@ -101,7 +101,6 @@ class View_text_edit:
 
     def _confirm(self):
         print(f"partnerInput is {self.partnerInput.get()}")
-        self.controller.modelLogData.record_conversation_partner_input(self.partnerInput.get())
         self.controller.add_conv_partner_input_to_history(self.partnerInput.get())
         self.root.destroy()
 

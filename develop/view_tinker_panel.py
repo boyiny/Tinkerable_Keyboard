@@ -23,56 +23,22 @@ class View_tinker:
     WORD_PRED_NUM = [1,2,3,4]
     WORD_DISP_LOC = ["Fixed", "Above last pressed key"]
     WORD_PRED_APPROACH = ["Retrieval", "Generation"]
-    # WORD_PRED_METHOD = ["BM25Okapi", "BM25L", "BM25Plus", "GPT-2", "RoBERTa"]
+
     
     K1_BM25OKAPI = 1.5
     B_BM25OKAPI = 0.75
     EPSILON_BM25OKAPI = 0.25
 
-    # K1_BM25L = 1.5
-    # B_BM25L = 0.75
-    # DELTA_BM25L = 0.5
-    
-    # K1_BM25PLUS = 1.5
-    # B_BM25PLUS = 0.75
-    # DELTA_BM25PLUS = 1.0
-
-    # MODEL_GPT2 = ["distilgpt2", "gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl", "Please input..."]
-
-    # MODEL_ROBERTA = ["distilroberta-base","roberta-base", "roberta-large", "xlm-roberta-base", "xlm-roberta-large", "Please input..."]
-    
-
     SEN_PRED_NUM = [1,2,3,4]
     SEN_ENTRY_APPROACH = ["Left to right", "Keywords"]
     SEN_PRED_APPROACH = ["Retrieval", "Generation"]
-    # SEN_SIMILARITY = ["Text", "Semantics"]
     SEN_RETRIEVAL_METHOD = ["Textual similarity", "Semantic similarity"]
-    # SEN_RETRI_TEXT_METHOD = ["BM25Okapi", "BM25L", "BM25Plus"]
     SEN_RETRI_SEMAN_MODEL = ["all-mpnet-base-v2", "multi-qa-mpnet-base-dot-v1", "all-distilroberta-v1", "all-MiniLM-L12-v2", "multi-qa-distilbert-cos-v1", "all-MiniLM-L6-v2", "multi-qa-MiniLM-L6-cos-v1", "paraphrase-multilingual-mpnet-base-v2", "paraphrase-albert-small-v2", "paraphrase-multilingual-MiniLM-L12-v2", "paraphrase-MiniLM-L3-v2", "distiluse-base-multilingual-cased-v1", "distiluse-base-multilingual-cased-v2", "Please input..."]
-    SEN_GEN_METHOD = ["ChatGPT"] # , "KWickChat", "GPT-2"
-    # SEN_KW_HISTORY_NUM = 3
-    # SEN_KW_PERSONA_NUM = 3
-    # SEN_GPT2_APPROACH = ["Greedy search", "Beam search", "Top-k sampling", "Top-p sampling"]
-    # GPT2_MAX_LENGTH = 30
-    # GPT2_NO_REPEAT_NGRAM_SIZE = 2
-    # GPT2_NUM_BEAMS = 5
-    # GPT2_SEED = 0
-    # GPT2_TOP_K = 50
-    # GPT2_TOP_P = 0.92
+    SEN_GEN_METHOD = ["ChatGPT"] 
 
-    # KW_MAX_LENGTH = 20
-    # KW_MIN_LENGTH = 1
-    # KW_SEED = 0
-    # KW_TEMPERATURE = 0.7
-    # KW_TOP_K = 0
-    # KW_TOP_P = 0.9
-
-    # CHAT_GPT_TEMPERATURE = 0.5
     CHATGPT_TEMPERATURE_OPT = ["0.1 (conservative)", "0.3", "0.5 (neutral)", "0.7", "0.9 (imaginative)"]
 
     SEN_INTERATION_SCENARIO = ["Dialogue", "Narrative"]
-
-    # lastPersonaNum = 1
 
     WORD_PRED_TASK = ""
     SENTENCE_PRED_TASK = ""
@@ -154,6 +120,9 @@ class View_tinker:
 
 
     def _save(self):
+        if self.SENTENCE_PRED_TASK == "SENTENCE_SEMANTIC_SIMILARITY":
+            self._pop_up_model_loading_notification()
+
         if self.BOOL_WORD_TINKERED:
             self._save_word_pred_settings()
         if self.BOOL_SENTENCE_TINKERED:
@@ -162,8 +131,12 @@ class View_tinker:
         if self.BOOL_WORD_TINKERED or self.BOOL_SENTENCE_TINKERED:
             self.config.write(open(self.file,'w'))
             self.controller.get_tinker_data()
+            self.save_setting()
+
+        
 
         self.root.destroy()
+        
         self.BOOL_WORD_TINKERED = False
         self.BOOL_SENTENCE_TINKERED = False
 
@@ -184,9 +157,7 @@ class View_tinker:
         self.config.sections()
         self.controller.get_tinker_data()
 
-        if self.controller.sentence_pred_PREDICTION_TASK == 'SENTENCE_KWICKCHAT':
-            self.controller.pop_up_conv_partner_window_kwickchat()
-            # self.controller.modelLogData.record_conversation_partner_input()
+
 
     def auto_load_the_latest_setting(self):   
         # If no previous setting (i.e. folder is empty), load a basic one
@@ -238,7 +209,7 @@ class View_tinker:
     def run(self):
         
         self.root = tk.Tk()
-        self.root.title("Tinker Panel")
+        self.root.title("Prediction Setting Panel")
 
         bigFont = tkFont.Font(family='Arial', size=20)
         self.root.option_add("*Font", bigFont)
@@ -320,21 +291,26 @@ class View_tinker:
         ttk.Label(frame, text ="Prediction Approach").grid(sticky="E", column=0, row=3)
         self.wordPredApproach = ttk.Combobox(frame, values=self.WORD_PRED_APPROACH, state="readonly")
         self.wordPredApproach.grid(sticky="W", column=1, row=3)
-        self.wordPredApproach.current(0)
+        # self.wordPredApproach.current(0)
         self.wordPredApproach.bind("<<ComboboxSelected>>", lambda event: self._word_pred_approach(event, frame)) 
 
         # row 4
         ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=4)
         ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=4)
 
+
         
 
     """ Sentence Prediction Below """
+    def _pop_up_model_loading_notification(self):
+        ctypes.windll.user32.MessageBoxW(0, "Please wait a few minutes for downloading the model. You may close this window after the Prediction Setting Panel is automatically closed.", "Info", 0)
+
     def _sen_retrieval_method_combobox(self, event, frame): 
         if 'Semantic' in self.senRetrievalMethod.get():
             # Assign task
             self.SENTENCE_PRED_TASK = "SENTENCE_SEMANTIC_SIMILARITY"
             self.BOOL_SENTENCE_TINKERED = True
+
         else:
             # Assign task self.senRetrievalMethod.get() == "Textual similarity"
             self.SENTENCE_PRED_TASK = "SENTENCE_BM25OKAPI"
@@ -378,7 +354,7 @@ class View_tinker:
             ttk.Label(frame, text="       Retrieval Method").grid(sticky="E", column=0, row=4)
             self.senRetrievalMethod = ttk.Combobox(frame, values=self.SEN_RETRIEVAL_METHOD, state="readonly")
             self.senRetrievalMethod.grid(sticky="W", column=1, row=4)
-            self.senRetrievalMethod.current(0)
+            # self.senRetrievalMethod.current(0)
             self.senRetrievalMethod.bind("<<ComboboxSelected>>", lambda event: self._sen_retrieval_method_combobox(event, frame)) 
             # row 5
             ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=5)
@@ -394,7 +370,7 @@ class View_tinker:
             ttk.Label(frame, text="       Generation Method").grid(sticky="E", column=0, row=4)
             self.senGenMethod = ttk.Combobox(frame, values=self.SEN_GEN_METHOD, state="readonly")
             self.senGenMethod.grid(sticky="W", column=1, row=4)
-            self.senGenMethod.current(0)
+            # self.senGenMethod.current(0)
             self.senGenMethod.bind("<<ComboboxSelected>>", lambda event: self._sen_gen_method_combobox(event, frame))
             
             self._sen_gen_method_combobox(event,frame)
