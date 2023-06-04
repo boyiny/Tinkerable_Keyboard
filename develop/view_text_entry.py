@@ -1,6 +1,7 @@
 from os import system
 import tkinter as tk
 from tkinter import ttk
+import re
 
 
 class View_text_edit:
@@ -85,7 +86,7 @@ class View_text_edit:
                 """ Textbox has content """
                 # entryWordList = self.entry.split()
                 captionWordList = caption.split()
-                captionFirstWord = captionWordList[0] + " "
+                captionFirstWord =  re.sub(r"[^\w\d'\s]", '', captionWordList[0])  + " "
                 indexOfFirstWordOfCaptionInEntry = self.entry.lower().rfind(captionFirstWord.lower())
                 if indexOfFirstWordOfCaptionInEntry == -1: 
                     # didn't find

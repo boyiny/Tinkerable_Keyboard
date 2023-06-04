@@ -73,16 +73,10 @@ class Controller_main():
 
     def _experiment_mode(self):
         self.boolTrace = True
-        self.set_auto_trace()
+        # self.set_auto_trace()
         self.auto_load_the_latest_prediction_settings()
         self.auto_load_the_latest_ui_settings()
         
-    # def text_to_speech(self, text):
-    #     tts = gTTS(text=text, lang='en')
-    #     filename = "speak.mp3"
-    #     tts.save(filename)
-    #     # os.system(f"start {filename}")
-    #     # playsound(filename)
 
     def on_log_mode_button_click(self, textLoggingIndicator):
         if textLoggingIndicator == 'Logging typing':
@@ -168,7 +162,8 @@ class Controller_main():
             entry = self.viewEntry.entry.get()
             if entry == "":
                 """ First word """
-                self._make_word_fill(entry)
+                # self._make_word_fill(entry)
+                pass
             elif entry[-1] == " ":
                 """ Finished a word """
                 self._make_word_prediction(entry)
@@ -194,23 +189,14 @@ class Controller_main():
         if self.word_pred_PREDICTION_TASK == "WORD_BM25OKAPI": # "BM25L", "BM25Plus", "GPT-2", "RoBERTa"
             option = "BM25OKAPI"
             self.modelMain.load_bm25_word(option, self.k1_WORD_BM25OKAPI, self.b_WORD_BM25OKAPI, epsilon=self.epsilon_WORD_BM25OKAPI)
-        elif self.word_pred_PREDICTION_TASK == "WORD_BM25L":
-            option = "BM25L"
-            self.modelMain.load_bm25_word(option, self.k1_WORD_BM25L, self.b_WORD_BM25L, delta=self.delta_WORD_BM25L)
-        elif self.word_pred_PREDICTION_TASK == "WORD_BM25PLUS":
-            option = "BM25PLUS"
-            self.modelMain.load_bm25_word(option, self.k1_WORD_BM25PLUS, self.b_WORD_BM25PLUS, delta=self.delta_WORD_BM25PLUS)
-        elif self.word_pred_PREDICTION_TASK == "WORD_GPT2":
-            self.modelMain.load_gpt2_word(option=self.word_pred_PREDICTION_TASK, model=self.model_WORD_GPT2, seed=self.seed_WORD_GPT2)
-        elif self.word_pred_PREDICTION_TASK == "CHATGPT":
+        elif self.word_pred_PREDICTION_TASK == "WORD_CHATGPT":
             option = "CHATGPT"
-            self.modelMain.load_chatgpt(option, self.word_pred_PREDICTION_TASK, "WORD_PRED", self.temperature_SENTENCE_CHATGPT) 
+            self.modelMain.load_chatgpt_word(option, self.temperature_SENTENCE_CHATGPT) 
 
 
     def _sentence_prediction_settings(self):
         # link to view: show pred
         
-
         # link to view: sentence pred num
         self.viewKeypad.SENT_PRED_NUM = self.max_pred_num_SENTENCE_PREDICTION
 
@@ -231,20 +217,23 @@ class Controller_main():
         if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25OKAPI':
             option = 'BM25OKAPI'
             self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25OKAPI, self.b_SENTENCE_BM25OKAPI, epsilon=self.epsilon_SENTENCE_BM25OKAPI)
+        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_SEMANTIC_SIMILARITY':
+            option = 'SENTENCE_SEMANTIC_SIMILARITY'
+            self.modelMain.load_semantic_sen_retrieval_sentence(model=self.sen_retri_seman_model_SENTENCE_SEMANTIC_SIMILARITY)
         elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
             option = 'CHATGPT'
-            self.modelMain.load_chatgpt(option, self.sentence_entry_approach_SENTENCE_PREDICTION, self.interaction_scenario_SENTENCE_CHATGPT, self.temperature_SENTENCE_CHATGPT) 
+            self.modelMain.load_chatgpt_sentence(option, self.sentence_entry_approach_SENTENCE_PREDICTION, self.interaction_scenario_SENTENCE_CHATGPT, self.temperature_SENTENCE_CHATGPT) 
 
         # make the initial pred if there is entered text
         if self.sentence_pred_PREDICTION_TASK == '':
             self.viewKeypad.clear_placed_sentences()
+            self.viewEntry.entry = ''
         else:
             entry = self.viewEntry.entry.get()
             if entry != '':
                 predictedSentence = self._make_sentence_prediction(entry)
-                self.viewKeypad.clear_placed_sentences()
                 self.viewKeypad.place_predicted_sentences(predSentence=predictedSentence) # TODO set different for KWickChat
-                self.viewMain.textBox.set(predictedSentence)
+
 
     def assign_task(self):
         self._word_prediction_settings()
@@ -305,7 +294,8 @@ class Controller_main():
             """ Initial input """   
             if self.boolWordPredDisplay:      
                 # set fill initial word  
-                predWords = self._make_word_fill(entry)
+                # predWords = self._make_word_fill(entry)
+                pass
             else:
                 self.viewKeypad.clear_placed_words()
             if self.boolSentencePredDisplay:
@@ -366,29 +356,26 @@ class Controller_main():
         else:
             if entry != '':
                 self.add_user_input_to_history_for_retrieval(entry)
-        # re_load retrieval function
+        # reload retrieval function
         if self.word_pred_PREDICTION_TASK == "WORD_BM25OKAPI": # "BM25L", "BM25Plus", "GPT-2", "RoBERTa"
             option = "BM25OKAPI"
             self.modelMain.load_bm25_word(option, self.k1_WORD_BM25OKAPI, self.b_WORD_BM25OKAPI, epsilon=self.epsilon_WORD_BM25OKAPI)
-        elif self.word_pred_PREDICTION_TASK == "WORD_BM25L":
-            option = "BM25L"
-            self.modelMain.load_bm25_word(option, self.k1_WORD_BM25L, self.b_WORD_BM25L, delta=self.delta_WORD_BM25L)
-        elif self.word_pred_PREDICTION_TASK == "WORD_BM25PLUS":
-            option = "BM25PLUS"
-            self.modelMain.load_bm25_word(option, self.k1_WORD_BM25PLUS, self.b_WORD_BM25PLUS, delta=self.delta_WORD_BM25PLUS)
+        # if self.word_pred_PREDICTION_TASK == "WORD_CHATGPT": 
+        #     option = "WORD_CHATGPT"
+        #     self.modelMain.load_chatgpt_word(option, self.temperature_WORD_CHATGPT)
+
 
         if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25OKAPI':
             option = 'BM25OKAPI'
             self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25OKAPI, self.b_SENTENCE_BM25OKAPI, epsilon=self.epsilon_SENTENCE_BM25OKAPI)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25L':
-            option = 'BM25L'
-            self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25L, self.b_SENTENCE_BM25L, delta=self.delta_SENTENCE_BM25L)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25PLUS':
-            option = 'BM25PLUS'
-            self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25PLUS, self.b_SENTENCE_BM25PLUS, delta=self.delta_SENTENCE_BM25PLUS)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_SEMANTIC_SIMILARITY':
-            option = 'SEMANTIC_SIMILARITY'
-            self.modelMain.load_semantic_sen_retrieval_sentence(model=self.sen_retri_seman_model_SENTENCE_SEMANTIC_SIMILARITY)
+        # elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_SEMANTIC_SIMILARITY':
+        #  Do not load, it takes agoes. 
+        #     option = 'SEMANTIC_SIMILARITY'
+        #     self.modelMain.load_semantic_sen_retrieval_sentence(model=self.sen_retri_seman_model_SENTENCE_SEMANTIC_SIMILARITY)
+        
+        # elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
+        #     option = 'SENTENCE_CHATGPT'
+        #     self.modelMain.load_chatgpt_sentence(option, self.sentence_entry_approach_SENTENCE_PREDICTION, self.interaction_scenario_SENTENCE_CHATGPT, self.temperature_SENTENCE_CHATGPT)
 
             
     def on_predicted_word_button_click(self, entry):
@@ -576,7 +563,8 @@ class Controller_main():
         entry = self.viewEntry.entry.get()
         if entry == "":
             """ First word """
-            predWords = self._make_word_fill(entry)
+            # predWords = self._make_word_fill(entry)
+            pass
         elif entry[-1] == " ":
             """ Finished a word """
             predWords = self._make_word_prediction(entry)

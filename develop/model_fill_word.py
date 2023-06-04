@@ -19,7 +19,7 @@ class Model_Fill_Word:
             sen = sentence.rstrip("\n") 
 
             """ remove punctuations in a sentence """
-            sen = re.sub(r'[^\w\s]','', sen) 
+            sen = re.sub(r"[^\w\d'\s]",'', sen) 
 
             self.corpus.append(sen)
 

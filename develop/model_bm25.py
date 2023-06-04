@@ -36,7 +36,7 @@ class Model_Bm25:
             sen = sentence.rstrip("\n") 
 
             """ remove punctuations in a sentence """
-            sen = re.sub(r'[^\w\s]','', sen) 
+            sen = re.sub(r"[^\w\d'\s]",'', sen) 
 
             """ set all words to lower case """
             sen = sen.lower()

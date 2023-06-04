@@ -350,6 +350,7 @@ class View_keypad:
             for predSentenceBtn in self.predictedSentenceButtons:
                 predSentenceBtn.destroy()
             self.predictedSentenceButtons = []
+        self.entry = ''
 
     
 
