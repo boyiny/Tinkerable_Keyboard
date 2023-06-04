@@ -129,7 +129,7 @@ class Model_Fill_Word:
         return self.predWords
 
 if __name__ == '__main__':
-    model = Fill_Word()
+    model = Model_Fill_Word()
     query = ""
     words = model.predict_current_word(query)
     print(f"Words: {words}")
