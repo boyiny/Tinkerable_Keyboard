@@ -60,8 +60,10 @@ class View_logging_indicator:
 
     def update_logging_indicator(self, textLoggingIndicator):
         if textLoggingIndicator == "Logging typing":
+            self.controller.set_trace(True)
             colour = '#302B29'
         else:
+            self.controller.set_trace(False)
             colour = '#857C77'
         self.loggingIndicatorBtn.config(text=textLoggingIndicator, fg=colour)
         self.textLoggingIndicator = textLoggingIndicator
@@ -348,6 +350,7 @@ class View_keypad:
             for predSentenceBtn in self.predictedSentenceButtons:
                 predSentenceBtn.destroy()
             self.predictedSentenceButtons = []
+        self.entry = ''
 
     
 
