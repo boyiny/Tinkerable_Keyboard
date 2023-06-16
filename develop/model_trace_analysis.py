@@ -5,7 +5,6 @@ import pandas as pd
 import time
 import os
 
-from sympy import li
 
 class Model_Trace_Analysis:
     def __init__(self):
@@ -16,6 +15,7 @@ class Model_Trace_Analysis:
             os.makedirs('analysis/ui_setting')
         timestr = time.strftime("%Y%m%d_%H%M%S")
         self.txt_path = './analysis/klm_bei_record/typing_log_'+str(timestr)+'.txt'
+        # print("EXE text path >>>>>>>>>"+self.txt_path)
         self.result_path = './analysis/klm_bei_record/human_factor_analysis_'+str(timestr)+'.xlsx'
         self.f = open(self.txt_path, 'a+')
         print("trace analysis initialisation")
@@ -93,8 +93,8 @@ class Model_Trace_Analysis:
                 break
             if boolLogData:
                 logDictList.append(self._extract_info_from_line(line))
-        print("log dictionary list:")
-        print(logDictList)
+        # print("log dictionary list:")
+        # print(logDictList)
         
         # seprate by sentences
         oneSentence = []

@@ -1,14 +1,14 @@
 import threading
 from os import system
 import os
-from model_fill_word import Model_Fill_Word
-from model_bm25 import Model_Bm25
-from model_semantic_sentence_retrieval import Model_Semantic_Sentence_Retrieval
+from develop.model_fill_word import Model_Fill_Word
+from develop.model_bm25 import Model_Bm25
+# from develop.model_semantic_sentence_retrieval import Model_Semantic_Sentence_Retrieval
 # from model_kwickchat.model_kwickchat import Model_Kwickchat
-from model_speech_recognition import Model_Speech_Recognition
-from model_trace_analysis import Model_Trace_Analysis
-from model_chatgpt import Model_ChatGPT
-
+from develop.model_speech_recognition import Model_Speech_Recognition
+from develop.model_trace_analysis import Model_Trace_Analysis
+from develop.model_chatgpt import Model_ChatGPT
+import sys
 
 class Model_main:
     
@@ -73,8 +73,8 @@ class Model_main:
     def load_bm25_sentence(self, option, k1, b, epsilon=None, delta=None):
         self.bm25Sentence = Model_Bm25(option, k1, b, epsilon, delta, boolEntryByKeywords=self.BOOL_ENTRY_BY_KEYWORDS)
 
-    def load_semantic_sen_retrieval_sentence(self, model):
-        self.semanticSenRetriSentence = Model_Semantic_Sentence_Retrieval(model, boolEntryByKeywords=self.BOOL_ENTRY_BY_KEYWORDS)
+    # def load_semantic_sen_retrieval_sentence(self, model):
+    #     self.semanticSenRetriSentence = Model_Semantic_Sentence_Retrieval(model, boolEntryByKeywords=self.BOOL_ENTRY_BY_KEYWORDS)
     
 
     def load_chatgpt_sentence(self, option, sentence_entry_approach, interaction_scenario, temperature):
@@ -86,17 +86,34 @@ class Model_main:
         partnerInput = self.partnerSpeech.partnerSpeechInputRecognition()
         return partnerInput
 
+    def _add_input_to_retrieval_dataset(self, text):
+        text = text + '\n'
+        bundleDir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+        bundleTxtPath = os.path.abspath(os.path.join(bundleDir, './Dataset/sent_train_aac.txt'))
+        with open(bundleTxtPath, 'a') as bundleFile:
+            bundleFile.write(text)
+        bundleFile.close()
+        # copy bundle dataset to local dataset 
+        
+        localTxtFile = "./Dataset/sent_train_aac.txt"
+
+        try:
+            with open(bundleTxtPath, 'r') as input:
+                with open(localTxtFile, 'w') as output:
+                    for line in input:
+                        output.write(line)
+        except:
+            print("In develop mode")
+
+
+
+
     def add_conv_partner_input_to_history_for_dialogue(self, partnerInput):
         partnerInputGPT = f"B: {partnerInput}"
         self.chatgptSentence.record_conversation_history(partnerInputGPT)
         # self.conversation_history.append(partnerInput)
         # TODO: Add to word prediction dataset
-        partnerInput = partnerInput + '\n'
-        txt_path = './Dataset/sent_train_aac.txt'
-        txt_path = os.path.join(os.path.dirname(__file__), txt_path)
-        with open(txt_path, 'a') as file:
-            file.write(partnerInput)
-        file.close()
+        self._add_input_to_retrieval_dataset(partnerInput)
 
     
     def add_user_input_to_history_for_chatgpt(self, userInput):
@@ -106,22 +123,12 @@ class Model_main:
         self.chatgptSentence.record_conversation_history(userInputGPT)
         
         # Add to word prediction dataset
-        userInput = userInput + '\n'
-        txt_path = './Dataset/sent_train_aac.txt'
-        txt_path = os.path.join(os.path.dirname(__file__), txt_path)
-        with open(txt_path, 'a') as file:
-            file.write(userInput)
-        file.close()
+        self._add_input_to_retrieval_dataset(userInput)
 
     def add_user_input_to_history_for_retrieval(self, userInput):
         # when "Speak" button is clicked, except chatgpt mode
         userInput = userInput.strip()
-        userInput = userInput + '\n'
-        txt_path = './Dataset/sent_train_aac.txt'
-        txt_path = os.path.join(os.path.dirname(__file__), txt_path)
-        with open(txt_path, 'a') as file:
-            file.write(userInput)
-        file.close()
+        self._add_input_to_retrieval_dataset(userInput)
 
 
     def make_word_prediction(self, entry):
@@ -133,7 +140,7 @@ class Model_main:
             predWords = self.chatgptWord.generate_words(history=self.conversation_history, message=entry)
 
         predWordsInNum = self._get_required_num_of_pred(predWords, self.wordPredNum)
-        print(f"pred method: {self.WORD_PRED_METHOD}, pred words: {predWordsInNum}")
+        # print(f"pred method: {self.WORD_PRED_METHOD}, pred words: {predWordsInNum}")
 
         return predWordsInNum
 
@@ -178,7 +185,7 @@ class Model_main:
 
         predSetencesInNum = self._get_required_num_of_pred(predSentences, self.sentencePredNum)
         
-        print(f"pred method: {self.SENT_PRED_METHOD}, pred sentence: {predSetencesInNum}")
+        # print(f"pred method: {self.SENT_PRED_METHOD}, pred sentence: {predSetencesInNum}")
         
         return predSetencesInNum
 

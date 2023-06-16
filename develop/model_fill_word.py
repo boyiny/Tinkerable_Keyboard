@@ -1,17 +1,54 @@
-from data_types import Word_importance
+from develop.data_types import Word_importance
 import os
 import re
-
+import sys
 
 class Model_Fill_Word:
     WORD_PRED_NUM = 10
 
     def __init__(self):
-        txt_path = './Dataset/sent_train_aac.txt'
-        # print(f"{os.path.dirname(__file__)}")
-        txt_path = os.path.join(os.path.dirname(__file__), txt_path)
-        with open(txt_path, 'r') as file:
-            self.lines = file.readlines()
+
+        if not os.path.exists('Dataset'):
+            os.makedirs('Dataset')
+
+        localTxtFile = './Dataset/sent_train_aac.txt'
+        if not os.path.exists(localTxtFile):
+            # load original dataset for retrieval
+            bundleDir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+            bundleTxtPath = os.path.abspath(os.path.join(bundleDir, './Dataset/sent_train_aac.txt'))
+            # copy original dataset to loacl
+            with open(bundleTxtPath, 'r') as input:
+                output = open(localTxtFile, 'w+')
+                for line in input:
+                    output.write(line)
+                output.close()
+                    
+        elif os.stat(localTxtFile).st_size == 0: 
+            # load original dataset for retrieval
+            bundleDir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+            bundleTxtPath = os.path.abspath(os.path.join(bundleDir, './Dataset/sent_train_aac.txt'))
+            # copy original dataset to loacl
+            with open(bundleTxtPath, 'r') as input:
+                with open(localTxtFile, 'w') as output:
+                    for line in input:
+                        output.write(line)
+        else:
+            # load updated dataset for retrieval
+            bundleDir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+            bundleTxtPath = os.path.abspath(os.path.join(bundleDir, './Dataset/sent_train_aac.txt'))
+            with open(localTxtFile, 'r') as input:
+                with open(bundleTxtPath, 'w') as output:
+                    for line in input:
+                        output.write(line)
+        
+        with open(bundleTxtPath, 'r') as file:
+                self.lines = file.readlines()
+
+
+        # bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+        # txt_path = os.path.abspath(os.path.join(bundle_dir, './Dataset/sent_train_aac.txt'))
+        # with open(txt_path, 'r') as file:
+        #     self.lines = file.readlines()
         self.corpus = []
         
         for sentence in self.lines:
@@ -71,7 +108,7 @@ class Model_Fill_Word:
         
         queryListOfWords = self.query.split()
         currentUnfinishedWord = queryListOfWords[-1]
-        print(f"current unfinished word: {currentUnfinishedWord}")
+        # print(f"current unfinished word: {currentUnfinishedWord}")
 
         predCurrentWords = []
         if self.wordsImportance != []:

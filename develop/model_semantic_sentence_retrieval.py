@@ -4,7 +4,7 @@ import torch
 import os
 
 class Model_Semantic_Sentence_Retrieval:
-    MODEL = 'all-mpnet-base-v2'
+    MODEL = 'all-MiniLM-L6-v2' # 'all-mpnet-base-v2'
     BOOL_ENTRY_BY_KEYWORDS = False
 
     def __init__(self, model, boolEntryByKeywords=None):
@@ -65,11 +65,11 @@ class Model_Semantic_Sentence_Retrieval:
     #         newSentencesEmbedding = self.model.encode(newSentences, convert_to_tensor=True)
     #         corpusEmbeddings = torch.cat([self.corpusEmbeddings, newSentencesEmbedding.reshape(newSentencesEmbedding.shape[0],newSentencesEmbedding.shape[1])], dim=0)
 
-if __name__ == '__main__':
-    modelSenPred = Model_Semantic_Sentence_Retrieval()
+# if __name__ == '__main__':
+#     modelSenPred = Model_Semantic_Sentence_Retrieval()
 
-    while True:
-        query = input("Your query: ")
-        predSentences = modelSenPred.retrieve_sentences(query)
-        for sen in predSentences:
-            print(sen)
+#     while True:
+#         query = input("Your query: ")
+#         predSentences = modelSenPred.retrieve_sentences(query)
+#         for sen in predSentences:
+#             print(sen)

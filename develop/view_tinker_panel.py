@@ -15,6 +15,7 @@ import time
 import shutil
 import ctypes
 import glob
+import sys
 
 
 
@@ -32,7 +33,7 @@ class View_tinker:
     SEN_PRED_NUM = [1,2,3,4]
     SEN_ENTRY_APPROACH = ["Left to right", "Keywords"]
     SEN_PRED_APPROACH = ["Retrieval", "Generation"]
-    SEN_RETRIEVAL_METHOD = ["Textual similarity", "Semantic similarity"]
+    SEN_RETRIEVAL_METHOD = ["Textual similarity"] #, "Semantic similarity"
     SEN_RETRI_SEMAN_MODEL = ["all-mpnet-base-v2", "multi-qa-mpnet-base-dot-v1", "all-distilroberta-v1", "all-MiniLM-L12-v2", "multi-qa-distilbert-cos-v1", "all-MiniLM-L6-v2", "multi-qa-MiniLM-L6-cos-v1", "paraphrase-multilingual-mpnet-base-v2", "paraphrase-albert-small-v2", "paraphrase-multilingual-MiniLM-L12-v2", "paraphrase-MiniLM-L3-v2", "distiluse-base-multilingual-cased-v1", "distiluse-base-multilingual-cased-v2", "Please input..."]
     SEN_GEN_METHOD = ["ChatGPT"] 
 
@@ -52,7 +53,10 @@ class View_tinker:
 
 
         self.controller = controller
-        self.file = os.path.realpath(os.path.join(os.path.dirname(__file__), 'tinker.ini'))
+        bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+        self.file = os.path.abspath(os.path.join(bundle_dir, 'tinker.ini'))
+        # self.file = os.path.realpath(os.path.join(os.path.dirname(__file__), 'tinker.ini'))
+        print("EXE>>>>>>>> configure file location: "+str(self.file))
         self.config = configparser.ConfigParser()
         self.config.read(self.file)
         self.config.sections()
@@ -143,15 +147,31 @@ class View_tinker:
         
 
     def save_setting(self):
+        bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+        originalTinkerFile = os.path.abspath(os.path.join(bundle_dir, 'tinker.ini'))
+        
         timestr = time.strftime("%Y%m%d_%H%M%S")
-        tinkerFileName = "./analysis/prediction_setting/tinker_"+str(timestr)+".ini"
+        newTinkerFile = "./analysis/prediction_setting/tinker_"+str(timestr)+".ini"
         # copy current .ini file
-        shutil.copyfile('tinker.ini', tinkerFileName)
+
+        with open(originalTinkerFile, 'r') as input:
+            with open(newTinkerFile, 'w') as output:
+                for line in input:
+                    output.write(line)
+
+        # shutil.copy2(originalTinkerFile, newTinkerFile)
 
     def load_setting(self):
         saved_file = filedialog.askopenfilename(initialdir="/",title="Select a File", filetypes=(("Configuration files", "*.ini"),))
-        shutil.copyfile(saved_file, 'tinker.ini')
-        self.file = os.path.realpath(os.path.join(os.path.dirname(__file__), 'tinker.ini'))
+        bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+        tinkerFileBundle = os.path.abspath(os.path.join(bundle_dir, 'tinker.ini'))
+        # shutil.copyfile(saved_file, 'tinker.ini')
+        # self.file = os.path.realpath(os.path.join(os.path.dirname(__file__), 'tinker.ini'))
+        with open(saved_file, 'r') as input:
+            with open(tinkerFileBundle, 'w') as output:
+                for line in input:
+                    output.write(line)
+        self.file = tinkerFileBundle
         self.config = configparser.ConfigParser()
         self.config.read(self.file)
         self.config.sections()
@@ -181,6 +201,7 @@ class View_tinker:
         ctypes.windll.user32.MessageBoxW(0, "Current prediction settings have been saved.", "Info", 0)
 
     def default_setting(self):
+        # print("EXE >>>>> "+str(self.config))
         self.config.set('PREDICTION_TASK', 'word_pred', "WORD_BM25OKAPI")
         self.config.set('WORD_PREDICTION', 'max_pred_num', "4")
         self.config.set('WORD_PREDICTION', 'display_location', "Fixed")
@@ -303,7 +324,7 @@ class View_tinker:
 
     """ Sentence Prediction Below """
     def _pop_up_model_loading_notification(self):
-        ctypes.windll.user32.MessageBoxW(0, "Please wait a few minutes for downloading the model. You may close this window after the Prediction Setting Panel is automatically closed.", "Info", 0)
+        ctypes.windll.user32.MessageBoxW(0, "Please wait a few minutes for downloading the model. ", "Info", 0)
 
     def _sen_retrieval_method_combobox(self, event, frame): 
         if 'Semantic' in self.senRetrievalMethod.get():
@@ -354,7 +375,7 @@ class View_tinker:
             ttk.Label(frame, text="       Retrieval Method").grid(sticky="E", column=0, row=4)
             self.senRetrievalMethod = ttk.Combobox(frame, values=self.SEN_RETRIEVAL_METHOD, state="readonly")
             self.senRetrievalMethod.grid(sticky="W", column=1, row=4)
-            # self.senRetrievalMethod.current(0)
+            self.senRetrievalMethod.current(0)
             self.senRetrievalMethod.bind("<<ComboboxSelected>>", lambda event: self._sen_retrieval_method_combobox(event, frame)) 
             # row 5
             ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=5)

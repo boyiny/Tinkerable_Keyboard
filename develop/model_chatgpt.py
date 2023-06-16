@@ -1,10 +1,11 @@
 import openai
 import re
+import ctypes
 
 class Model_ChatGPT:
 
     def __init__(self, option, sentence_entry_approach, interaction_scenario, temperature) -> None:
-        print(f"ChatGPT option: {option}, sentence_entry_approach: {sentence_entry_approach}, interaction_scenario: {interaction_scenario}, temperature: {temperature}")
+        # print(f"ChatGPT option: {option}, sentence_entry_approach: {sentence_entry_approach}, interaction_scenario: {interaction_scenario}, temperature: {temperature}")
         openai.api_key = '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'
         self.OPTION = option
         self.SENTENCE_ENTRY_APPROACH = sentence_entry_approach
@@ -31,7 +32,7 @@ class Model_ChatGPT:
         message = ""
         prompt = f"Predict the next word based on the entry and conversation history. Example: System input: ['A: How are you doing today? ', 'B: Good. What about you?']. Sentence that replies to B to be complete: 'I am'. System output: 'great'."
         text = self.generate_words(history, message, prompt)
-        print("AI: "+ text[0])
+        # print("AI: "+ text[0])
 
 
     def _assign_task_left_to_right_dialogue(self):
@@ -40,28 +41,28 @@ class Model_ChatGPT:
         message = ""
         prompt = f"Complete the sentence based on the conversation history. Example: System input: History: ['A: How are you doing today?', 'B: Good. How about you?']. Sentence that replies to B to be completed: 'I am'. System output: 'I am doing well, thank you.'"
         text = self.generate_sentences(history, message, prompt)
-        print("AI: "+text[0])
+        # print("AI: "+text[0])
 
     def _assign_task_left_to_right_narrative(self):
         history = ""
         message = ""
         prompt = f"Complete the sentence based on the conversation history. Example: System input: History: ['A: I am a researcher at Cambridge.']. Sentence to be completed: 'My research'. System output: 'My research focuses on assistive technology.'"
         text = self.generate_sentences(history, message, prompt)
-        print("AI: "+text[0])
+        # print("AI: "+text[0])
 
     def _assign_task_keywords_dialogue(self):
         history = ""
         message = ""
         prompt = "Generate the sentence based on the conversation history and the given keywords. Example: System input: History: ['A: Do you have plans after work today?', 'B: I don't have plans yet. What about you?']. Keywords for replying B: ['movies', 'tonight', 'join']. System out put: 'I am going to watch movies tonight. Do you wanna join me?'"
         text = self.generate_sentences(history, message, prompt)
-        print("AI: "+text[0])
+        # print("AI: "+text[0])
 
     def _assign_task_keywords_narrative(self):
         history = ""
         message = ""
         prompt = f"Generate the sentence based on the conversation history and the given keywords. Example: System input: History: ['A: I am not feeling well.'] Keywords for generating the sentence: ['stomachache', 'morning']. System output: 'I have had a stomachache since this morning.'"
         text = self.generate_sentences(history, message, prompt)
-        print("AI: "+text[0])
+        # print("AI: "+text[0])
 
     # def _assign_task(self, prompt):
     #     # self.dialogue = Model_ChatGPT()
@@ -124,6 +125,8 @@ class Model_ChatGPT:
                     new_list.append(word)
         return new_list
 
+    def pop_up_chatgpt_error_notification(self):
+        ctypes.windll.user32.MessageBoxW(0, "ChatGPT server has reached the capacity, please try this function later.", "Info", 0)
 
     def generate_sentences(self, history, message, prompt=None):
         if prompt == None:
@@ -137,21 +140,45 @@ class Model_ChatGPT:
                 # self.SENTENCE_ENTRY_APPROACH == "Keywords" and self.INTERACTION_SCENARIO == "Narrative":
                 prompt = f"Generate the sentence based on the text input history: {history}. Keywords for generating the sentence: {message}. "
         
-        response = openai.Completion.create(
-            engine='text-davinci-003',
-            prompt=prompt,
-            n=8,
-            stop=None,
-            temperature=self.TEMPERATURE,
-            max_tokens=100
-        )
-        i = 0
         genSentenceList = []
-        for choice in response.choices:
-            # print("AI - "+ str(i) + ": " + choice.text.strip())
-            genSentenceList.append(choice.text.strip())
-            i+=1
-        genSentenceList = self.clean_generated_sentence_list(genSentenceList)
+        try:
+            response = openai.Completion.create(
+                engine='text-davinci-003',
+                prompt=prompt,
+                n=8,
+                stop=None,
+                temperature=self.TEMPERATURE,
+                max_tokens=100
+            )
+
+            i = 0
+            
+            for choice in response.choices:
+                # print("AI - "+ str(i) + ": " + choice.text.strip())
+                genSentenceList.append(choice.text.strip())
+                i+=1
+            genSentenceList = self.clean_generated_sentence_list(genSentenceList)
+
+        except openai.error.RateLimitError:
+            response = openai.Completion.create(
+                engine='text-davinci-001',
+                prompt=prompt,
+                n=8,
+                stop=None,
+                temperature=self.TEMPERATURE,
+                max_tokens=100
+            )
+
+            i = 0
+            for choice in response.choices:
+                # print("AI - "+ str(i) + ": " + choice.text.strip())
+                genSentenceList.append(choice.text.strip())
+                i+=1
+            genSentenceList = self.clean_generated_sentence_list(genSentenceList)
+
+        except openai.error.RateLimitError:
+            self.pop_up_chatgpt_error_notification()
+
         return genSentenceList
     
 
@@ -159,25 +186,43 @@ class Model_ChatGPT:
         
         prompt = f"Predict the next word based on the conversation history: {history}. Sentence to be complete: {message}. Make six next word predictions. Each prediction contains one word: "
         
-        response = openai.Completion.create(
-            engine='text-davinci-003',
-            prompt=prompt,
-            n=1,
-            stop=None,
-            temperature=self.TEMPERATURE,
-            max_tokens=100
-        )
-        i = 0
         genWordList = []
-        if len(response.choices) > 0:
-            genWordList = self.clean_generated_word_list(response.choices[0].text.strip())
-        else:
-            print("No word predictions")
-        print(genWordList)
-        # for choice in response.choices:
-        #     # print("AI - "+ str(i) + ": " + choice.text.strip())
-        #     genWordList.append(choice.text.strip())
-        #     i+=1
+        try: 
+            response = openai.Completion.create(
+                engine='text-davinci-003',
+                prompt=prompt,
+                n=1,
+                stop=None,
+                temperature=self.TEMPERATURE,
+                max_tokens=100
+            )
+            i = 0
+            
+            if len(response.choices) > 0:
+                genWordList = self.clean_generated_word_list(response.choices[0].text.strip())
+            else:
+                print("No word predictions")
+            # print(genWordList)
+
+        except openai.error.RateLimitError:
+            response = openai.Completion.create(
+                engine='text-davinci-001',
+                prompt=prompt,
+                n=1,
+                stop=None,
+                temperature=self.TEMPERATURE,
+                max_tokens=100
+            )
+            i = 0
+            if len(response.choices) > 0:
+                genWordList = self.clean_generated_word_list(response.choices[0].text.strip())
+            else:
+                print("No word predictions")
+            # print(genWordList)
+
+        except openai.error.RateLimitError:
+            self.pop_up_chatgpt_error_notification()
+
         
         return genWordList
 

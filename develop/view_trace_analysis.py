@@ -5,7 +5,8 @@ from tkinter import BOTTOM, ttk
 from tkinter import filedialog
 # from matplotlib.pyplot import text
 from pathlib import Path
-
+import os
+import sys
 # from soupsieve import select
 
 class View_trace_analysis:
@@ -16,9 +17,18 @@ class View_trace_analysis:
     
     def _browse_files(self):
         self.filePath = filedialog.askopenfilename(initialdir="/",title="Select a File", filetypes=(("Text files", "*.txt"),))
+        # bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+        # traceFileBundle = os.path.abspath(os.path.join(bundle_dir, 'tinker.ini'))
+        # print("EXE filePath >>>> "+ self.filePath)
+        # print("EXE bundle_dir >>>> "+ bundle_dir)
+        # with open(self.filePath, 'r') as input:
+        #     with open(tinkerFileBundle, 'w') as output:
+        #         for line in input:
+        #             output.write(line)
+
         fileName = Path(self.filePath).stem
         self.controller.traceLogFile = self.filePath
-        print(self.filePath)
+        # print(self.filePath)
         self.filePathLabel = tk.Label(self.baseFrame, width=21, text=fileName).grid(sticky="E", column=0, row=0)
 
     def _close(self):
