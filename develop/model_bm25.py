@@ -1,7 +1,8 @@
 from rank_bm25 import BM25Okapi, BM25L, BM25Plus
-from data_types import Word_importance
+from develop.data_types import Word_importance
 import os
 import re
+import sys
 
 class Model_Bm25:
     BM25_OPTION = "BM25Okapi"
@@ -23,12 +24,44 @@ class Model_Bm25:
         if option != None:
             self.BM25_OPTION = option
             self.BOOL_ENTRY_BY_KEYWORDS = boolEntryByKeywords
+        
+        if not os.path.exists('Dataset'):
+            os.makedirs('Dataset')
 
-        txt_path = './Dataset/sent_train_aac.txt'
-        # print(f"{os.path.dirname(__file__)}")
-        txt_path = os.path.join(os.path.dirname(__file__), txt_path)
-        with open(txt_path, 'r') as file:
-            self.lines = file.readlines()
+        localTxtFile = './Dataset/sent_train_aac.txt'
+        if not os.path.exists(localTxtFile):
+            # load original dataset for retrieval
+            bundleDir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+            bundleTxtPath = os.path.abspath(os.path.join(bundleDir, './Dataset/sent_train_aac.txt'))
+            # copy original dataset to loacl
+            with open(bundleTxtPath, 'r') as input:
+                output = open(localTxtFile, 'w')
+                for line in input:
+                    output.write(line)
+                output.close()
+        elif os.stat(localTxtFile).st_size == 0: 
+            # load original dataset for retrieval
+            bundleDir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+            bundleTxtPath = os.path.abspath(os.path.join(bundleDir, './Dataset/sent_train_aac.txt'))
+            # copy original dataset to loacl
+            with open(bundleTxtPath, 'r') as input:
+                with open(localTxtFile, 'w') as output:
+                    for line in input:
+                        output.write(line)
+        else:
+            # load updated dataset for retrieval
+            bundleDir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+            bundleTxtPath = os.path.abspath(os.path.join(bundleDir, './Dataset/sent_train_aac.txt'))
+            with open(localTxtFile, 'r') as input:
+                with open(bundleTxtPath, 'w') as output:
+                    for line in input:
+                        output.write(line)
+        
+        with open(bundleTxtPath, 'r') as file:
+                self.lines = file.readlines()
+
+
+
         self.corpus = []
         
         for sentence in self.lines:

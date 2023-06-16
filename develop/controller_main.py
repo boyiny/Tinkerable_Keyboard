@@ -1,17 +1,18 @@
 from pyexpat import model
-from view_trace_analysis import View_trace_analysis
-from model_trace_analysis import Model_Trace_Analysis
-from model_log_data import Model_Log_Data
-from model_main import Model_main
-from view_main import View_main, View_menu, View_text_box, View_keypad, View_logging_indicator
-from view_tinker_panel import View_tinker
-from view_text_entry import View_text_edit
-from view_key_size import View_key_size
+from develop.view_trace_analysis import View_trace_analysis
+from develop.model_trace_analysis import Model_Trace_Analysis
+from develop.model_log_data import Model_Log_Data
+from develop.model_main import Model_main
+from develop.view_main import View_main, View_menu, View_text_box, View_keypad, View_logging_indicator
+from develop.view_tinker_panel import View_tinker
+from develop.view_text_entry import View_text_edit
+from develop.view_key_size import View_key_size
 import pyttsx3
 # from gtts import gTTS
 
 import configparser 
 import os
+import sys
 
 
 
@@ -59,8 +60,10 @@ class Controller_main():
         self.boolSentencePredDisplay = False
 
         self.currentFilledWords = []
+        self.bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+        self.file = os.path.abspath(os.path.join(self.bundle_dir, 'tinker.ini'))
 
-        self.file = os.path.realpath(os.path.join(os.path.dirname(__file__), 'tinker.ini'))
+        # self.file = os.path.realpath(os.path.join(os.path.dirname(__file__), 'tinker.ini'))
         self.config = configparser.ConfigParser()
         self.config.read(self.file)
         self.config.sections()
@@ -88,10 +91,15 @@ class Controller_main():
 
 
     def get_tinker_data(self):
-        self.file = os.path.realpath(os.path.join(os.path.dirname(__file__), 'tinker.ini'))
+        bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+        self.file = os.path.abspath(os.path.join(bundle_dir, 'tinker.ini'))
+        # self.file = os.path.realpath(os.path.join(os.path.dirname(__file__), 'tinker.ini'))
         self.config = configparser.ConfigParser()
         self.config.read(self.file)
         self.config.sections()
+        # f = open(self.file, "r")
+        # print("EXE>>>>>>>>>>\n"+f.read())
+        # print("EXE>>>>>>>>>> File path: "+self.file)
 
         self.word_pred_PREDICTION_TASK          = self.config['PREDICTION_TASK']['word_pred']
         if self.word_pred_PREDICTION_TASK == '':
@@ -217,9 +225,9 @@ class Controller_main():
         if self.sentence_pred_PREDICTION_TASK == 'SENTENCE_BM25OKAPI':
             option = 'BM25OKAPI'
             self.modelMain.load_bm25_sentence(option, self.k1_SENTENCE_BM25OKAPI, self.b_SENTENCE_BM25OKAPI, epsilon=self.epsilon_SENTENCE_BM25OKAPI)
-        elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_SEMANTIC_SIMILARITY':
-            option = 'SENTENCE_SEMANTIC_SIMILARITY'
-            self.modelMain.load_semantic_sen_retrieval_sentence(model=self.sen_retri_seman_model_SENTENCE_SEMANTIC_SIMILARITY)
+        # elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_SEMANTIC_SIMILARITY':
+        #     option = 'SENTENCE_SEMANTIC_SIMILARITY'
+        #     self.modelMain.load_semantic_sen_retrieval_sentence(model=self.sen_retri_seman_model_SENTENCE_SEMANTIC_SIMILARITY)
         elif self.sentence_pred_PREDICTION_TASK == 'SENTENCE_CHATGPT':
             option = 'CHATGPT'
             self.modelMain.load_chatgpt_sentence(option, self.sentence_entry_approach_SENTENCE_PREDICTION, self.interaction_scenario_SENTENCE_CHATGPT, self.temperature_SENTENCE_CHATGPT) 
@@ -401,7 +409,8 @@ class Controller_main():
         
         # Trace record
         if self.boolTrace == True:
-            self.modelTraceAnalysis.record_pressed_button(caption='word: '+entry, wordPred=predWords, senPred=predSentences, currentSen=entry)
+            currentSen = self.viewMain.textBox.get()
+            self.modelTraceAnalysis.record_pressed_button(caption='word: '+entry, wordPred=predWords, senPred=predSentences, currentSen=currentSen)
         
 
     def on_predicted_sentence_button_click(self, entry):
@@ -481,7 +490,7 @@ class Controller_main():
                 lastWord = listOfWords[-1]
                 indexOfLastWord = entry.rfind(lastWord)
                 entryWithPredWord = entry[0:indexOfLastWord] + word
-            print(f"entryWithPredWord is {entryWithPredWord}.")
+            # print(f"entryWithPredWord is {entryWithPredWord}.")
             predSen = self.modelMain.make_sentence_prediction(entryWithPredWord)
             
             if len(predSen) > 0:
@@ -583,7 +592,7 @@ class Controller_main():
         """ For menu setting """
         
         entry = self.viewEntry.entry.get()
-        print(f"In controller_main, current entry is: '{entry}'")
+        # print(f"In controller_main, current entry is: '{entry}'")
         predictedSentence = self._make_sentence_prediction(entry)
         # set button place method
         # self.viewKeypad.BOOL_WORD_PRED_PRESSED_KEY = self.modelMain.set_word_pred_on_last_pressed_key(self.boolWordPredOnPressedKey)

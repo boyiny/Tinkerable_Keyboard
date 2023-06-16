@@ -8,12 +8,9 @@ import glob
 import os
 
 from tkinter import filedialog
-from pathlib import Path
 
-from view_text_entry import View_text_edit
-from view_tinker_panel import View_tinker
-from view_trace_analysis import View_trace_analysis
-from view_key_size import View_key_size
+from develop.view_tinker_panel import View_tinker
+from develop.view_trace_analysis import View_trace_analysis
 
 
 class View_main(tk.Tk): 
@@ -145,7 +142,7 @@ class View_keypad:
 
     """ General functions below """
     def load_key_size(self, keySizeDict):
-        print("In keypad view: ", keySizeDict)
+        # print("In keypad view: ", keySizeDict)
         self.record_button_position_size()
         for caption in keySizeDict.keys():
             index = self._get_index_in_keyList(caption)
@@ -335,7 +332,7 @@ class View_keypad:
 
     def place_predicted_sentences(self, predSentence):
         previousY = 0
-        print(f"In view_main, predSentence button: {predSentence}, lenth: {len(predSentence)}")
+        # print(f"In view_main, predSentence button: {predSentence}, lenth: {len(predSentence)}")
         if len(predSentence) < self.SENT_PRED_NUM:
             for sentence in predSentence: 
                 predictedSentenceBtn, previousY = self._make_sentence_prediction_button(frame=self.keypadFrame, predSentence=sentence, previousY=previousY)
