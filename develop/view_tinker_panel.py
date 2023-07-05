@@ -56,7 +56,7 @@ class View_tinker:
         bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
         self.file = os.path.abspath(os.path.join(bundle_dir, 'tinker.ini'))
         # self.file = os.path.realpath(os.path.join(os.path.dirname(__file__), 'tinker.ini'))
-        print("EXE>>>>>>>> configure file location: "+str(self.file))
+        # print("EXE>>>>>>>> configure file location: "+str(self.file))
         self.config = configparser.ConfigParser()
         self.config.read(self.file)
         self.config.sections()

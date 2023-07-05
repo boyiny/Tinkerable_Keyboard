@@ -104,18 +104,18 @@ class Controller_main():
         self.word_pred_PREDICTION_TASK          = self.config['PREDICTION_TASK']['word_pred']
         if self.word_pred_PREDICTION_TASK == '':
             self.boolWordPredDisplay = False
-            print(f"word pred task is empty")
+            # print(f"word pred task is empty")
         else:
             self.boolWordPredDisplay = True
-            print(f"word pred task: {self.word_pred_PREDICTION_TASK}")
+            # print(f"word pred task: {self.word_pred_PREDICTION_TASK}")
         
         self.sentence_pred_PREDICTION_TASK      = self.config['PREDICTION_TASK']['sentence_pred']
         if self.sentence_pred_PREDICTION_TASK == '':
             self.boolSentencePredDisplay = False
-            print(f"sen pred task is empty")
+            # print(f"sen pred task is empty")
         else:
             self.boolSentencePredDisplay = True
-            print(f"sen pred task: {self.sentence_pred_PREDICTION_TASK}")
+            # print(f"sen pred task: {self.sentence_pred_PREDICTION_TASK}")
 
         self.max_pred_num_WORD_PREDICTION       = int(self.config['WORD_PREDICTION']['max_pred_num'])
         self.display_location_WORD_PREDICTION   = str(self.config['WORD_PREDICTION']['display_location'])
@@ -293,6 +293,9 @@ class Controller_main():
             self.currentPressedKey = caption
             text = self.viewTextEdit.edit_text_letter(caption) 
             self.viewMain.textBox.set(text)
+            if caption == "Clear All" or caption == "Speak":
+                self.viewKeypad.clear_placed_words()
+                self.viewKeypad.clear_placed_sentences()
 
         predWords = []
         predSentences = []

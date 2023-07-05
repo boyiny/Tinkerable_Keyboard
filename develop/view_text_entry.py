@@ -101,7 +101,7 @@ class View_text_edit:
         self.root.destroy()
 
     def _confirm(self):
-        print(f"partnerInput is {self.partnerInput.get()}")
+        # print(f"partnerInput is {self.partnerInput.get()}")
         self.controller.add_conv_partner_input_to_history(self.partnerInput.get())
         self.root.destroy()
 
