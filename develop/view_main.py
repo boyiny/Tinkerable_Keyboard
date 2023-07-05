@@ -58,11 +58,13 @@ class View_logging_indicator:
     def update_logging_indicator(self, textLoggingIndicator):
         if textLoggingIndicator == "Logging typing":
             self.controller.set_trace(True)
-            colour = '#302B29'
+            textColour = '#E0E0E0'
+            bgColour = '#009900'
         else:
             self.controller.set_trace(False)
-            colour = '#857C77'
-        self.loggingIndicatorBtn.config(text=textLoggingIndicator, fg=colour)
+            textColour = '#E0E0E0'
+            bgColour = '#FF3333'
+        self.loggingIndicatorBtn.config(text=textLoggingIndicator, fg=textColour, bg=bgColour)
         self.textLoggingIndicator = textLoggingIndicator
    
 
@@ -206,7 +208,7 @@ class View_keypad:
             key = "index: " + str(indexKeyList) + ", caption: " + caption + ", placeX: " + str(button.winfo_rootx()) + ", placeY: " + str(button.winfo_rooty()) + ", sizeX: " + str(button.winfo_width()) + ", sizeY: " + str(button.winfo_height()) + "\n"
             f.write(key)
         f.close()
-        print("saved keyboard layout")
+        # print("saved keyboard layout")
 
     def pop_up_layout_saved_notification(self):
         ctypes.windll.user32.MessageBoxW(0, "Current keypad layout has been saved.", "Info", 0)
@@ -331,7 +333,7 @@ class View_keypad:
         return predSentenceBtn, previousY
 
     def place_predicted_sentences(self, predSentence):
-        previousY = 0
+        previousY = 80
         # print(f"In view_main, predSentence button: {predSentence}, lenth: {len(predSentence)}")
         if len(predSentence) < self.SENT_PRED_NUM:
             for sentence in predSentence: 

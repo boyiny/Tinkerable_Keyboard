@@ -18,7 +18,7 @@ class Model_Trace_Analysis:
         # print("EXE text path >>>>>>>>>"+self.txt_path)
         self.result_path = './analysis/klm_bei_record/human_factor_analysis_'+str(timestr)+'.xlsx'
         self.f = open(self.txt_path, 'a+')
-        print("trace analysis initialisation")
+        # print("trace analysis initialisation")
         
 
     def set_trace(self, boolTrace):
@@ -26,12 +26,12 @@ class Model_Trace_Analysis:
             self.f = open(self.txt_path, 'a')
             self.f.write("----------------Start a new log----------------\n")
             self.f.close()
-            print("trace on")
+            # print("trace on")
         else:
             self.f = open(self.txt_path, 'a')
             self.f.write("----------------End the log----------------\n")
             self.f.close()
-            print("trace off")
+            # print("trace off")
         return boolTrace
 
     """ trace typing below """

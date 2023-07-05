@@ -201,7 +201,8 @@ class Model_ChatGPT:
             if len(response.choices) > 0:
                 genWordList = self.clean_generated_word_list(response.choices[0].text.strip())
             else:
-                print("No word predictions")
+                # print("No word predictions")
+                pass
             # print(genWordList)
 
         except openai.error.RateLimitError:
@@ -217,7 +218,8 @@ class Model_ChatGPT:
             if len(response.choices) > 0:
                 genWordList = self.clean_generated_word_list(response.choices[0].text.strip())
             else:
-                print("No word predictions")
+                # print("No word predictions")
+                pass
             # print(genWordList)
 
         except openai.error.RateLimitError:

@@ -96,7 +96,7 @@ class Model_Bm25:
                 self.b_BM25PLUS = delta
             self.bm25 = BM25Plus(self.tokenized_corpus, k1=self.k1_BM25PLUS, b=self.k1_BM25PLUS, delta=self.delta_BM25PLUS)
         else:
-            print(f"Unknown BM25 selection, using BM25Okapi...")
+            # print(f"Unknown BM25 selection, using BM25Okapi...")
             self.bm25 = BM25Okapi(self.tokenized_corpus)
         
         allWords = []
