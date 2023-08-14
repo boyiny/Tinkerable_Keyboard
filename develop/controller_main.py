@@ -119,6 +119,7 @@ class Controller_main():
 
         self.max_pred_num_WORD_PREDICTION       = int(self.config['WORD_PREDICTION']['max_pred_num'])
         self.display_location_WORD_PREDICTION   = str(self.config['WORD_PREDICTION']['display_location'])
+        self.type_WORD_PREDICTION               = str(self.config['WORD_PREDICTION']['type'])
         self.method_WORD_PREDICTION             = str(self.config['WORD_PREDICTION']['method'])
         
         self.k1_WORD_BM25OKAPI           = float(self.config['WORD_BM25OKAPI']['k1'])
@@ -166,22 +167,33 @@ class Controller_main():
             self.viewKeypad.clear_placed_words()
         else:
             # make the first prediction based on current input
-            self.modelMain.load_fill_word()
-            entry = self.viewEntry.entry.get()
-            if entry == "":
-                """ First word """
-                # self._make_word_fill(entry)
-                pass
-            elif entry[-1] == " ":
-                """ Finished a word """
-                self._make_word_prediction(entry)
-                """ Log the word level text entry """
-                if self.boolTrace:
-                    self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, scenario=self.interaction_scenario_SENTENCE_CHATGPT, currentSen = entry)
+            if self.type_WORD_PREDICTION == 'Current and Next Word':
+                self.modelMain.load_fill_word()
+                entry = self.viewEntry.entry.get()
+                if entry == "":
+                    """ First word """
+                    # self._make_word_fill(entry)
+                    pass
+                elif entry[-1] == " ":
+                    """ Finished a word """
+                    self._make_word_prediction(entry)
+                    """ Log the word level text entry """
+                    if self.boolTrace:
+                        self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, scenario=self.interaction_scenario_SENTENCE_CHATGPT, currentSen = entry)
 
-            else:
-                """ Typing a word """
-                self._make_word_fill(entry)
+                else:
+                    """ Typing a word """
+                    self._make_word_fill(entry)
+            else: # 'Current Word'
+                self.modelMain.load_fill_word()
+                entry = self.viewEntry.entry.get()
+                if entry == "":
+                    pass
+                elif entry[-1] == " ":
+                    self.viewKeypad.clear_placed_words()
+                else:
+                    self._make_word_fill(entry)
+                
 
         # link to view: show pred loaction
         if self.display_location_WORD_PREDICTION == 'Above last pressed key':
@@ -573,19 +585,28 @@ class Controller_main():
             self.viewKeypad.BOOL_WORD_PRED_PRESSED_KEY = False
 
         entry = self.viewEntry.entry.get()
-        if entry == "":
-            """ First word """
-            # predWords = self._make_word_fill(entry)
-            pass
-        elif entry[-1] == " ":
-            """ Finished a word """
-            predWords = self._make_word_prediction(entry)
-            """ Log the word level text entry """
-            if self.boolTrace:
-                self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, scenario=self.interaction_scenario_SENTENCE_CHATGPT, currentSen = entry)
-        else:
-            """ Typing a word """
-            predWords = self._make_word_fill(entry)
+        if self.type_WORD_PREDICTION == "Current and Next Word":
+            if entry == "":
+                """ First word """
+                # predWords = self._make_word_fill(entry)
+                pass
+            elif entry[-1] == " ":
+                """ Finished a word """
+                predWords = self._make_word_prediction(entry)
+                """ Log the word level text entry """
+                if self.boolTrace:
+                    self.modelLogData.record_word_level_input(wordPredAlgo=self.word_pred_PREDICTION_TASK, sentencePredAlgo=self.sentence_pred_PREDICTION_TASK, sentenceEntryApproach=self.sentence_entry_approach_SENTENCE_PREDICTION, scenario=self.interaction_scenario_SENTENCE_CHATGPT, currentSen = entry)
+            else:
+                """ Typing a word """
+                predWords = self._make_word_fill(entry)
+        else: # "Current Word"
+            if entry == "":
+                pass
+            elif entry[-1] == " ":
+                self.viewKeypad.clear_placed_words()
+            else:
+                """ Typing a word """
+                predWords = self._make_word_fill(entry)
 
         return predWords
 
