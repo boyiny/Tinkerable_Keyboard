@@ -21,9 +21,11 @@ import sys
 
 
 class View_tinker:
-    WORD_PRED_NUM = [1,2,3,4]
+    WORD_PRED_NUM = [1,2,3,4] 
     WORD_DISP_LOC = ["Fixed", "Above last pressed key"]
+    WORD_PRED_TYPE = ["Current Word", "Current and Next Word"]
     WORD_PRED_APPROACH = ["Retrieval", "Generation"]
+    WORD_PRED_APPROACH_FIXED = ["Retrieval"]
 
     
     K1_BM25OKAPI = 1.5
@@ -69,6 +71,7 @@ class View_tinker:
     def _save_word_pred_settings(self):
         self.config.set('PREDICTION_TASK', 'word_pred', str(self.WORD_PRED_TASK))
         self.config.set('WORD_PREDICTION', 'max_pred_num', self.maxWordPredNum.get())
+        self.config.set('WORD_PREDICTION', 'type', self.wordPredType.get())
         self.config.set('WORD_PREDICTION', 'display_location', self.wordDisplayLocation.get())
         self.config.set('WORD_PREDICTION', 'method', self.wordPredApproach.get())
         
@@ -205,6 +208,7 @@ class View_tinker:
         self.config.set('PREDICTION_TASK', 'word_pred', "WORD_BM25OKAPI")
         self.config.set('WORD_PREDICTION', 'max_pred_num', "4")
         self.config.set('WORD_PREDICTION', 'display_location', "Fixed")
+        self.config.set('WORD_PREDICTION', 'type', "Current and Next Word")
         self.config.set('WORD_PREDICTION', 'method', "Retrieval")
         self.config.set('WORD_BM25OKAPI', 'k1', str(self.K1_BM25OKAPI))
         self.config.set('WORD_BM25OKAPI', 'b', str(self.B_BM25OKAPI))
@@ -277,17 +281,43 @@ class View_tinker:
     def _word_pred_approach(self, event, frame):
         if self.wordPredApproach.get() == 'Generation':
             self.WORD_PRED_TASK = "WORD_CHATGPT"
-            # row 4
-            ttk.Label(frame, text="Creativity", font=('bold')).grid(sticky="E", column=0, row=4)
+            # row 5
+            ttk.Label(frame, text="Creativity", font=('bold')).grid(sticky="E", column=0, row=5)
             self.wordChatGPTTemperature = ttk.Combobox(frame, values=self.CHATGPT_TEMPERATURE_OPT, state="readonly")
             self.wordChatGPTTemperature.current(2)
-            self.wordChatGPTTemperature.grid(sticky="W", column=1, row=4)
+            self.wordChatGPTTemperature.grid(sticky="W", column=1, row=5)
 
         else: 
             self.WORD_PRED_TASK = "WORD_BM25OKAPI"
+            # row 5
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=5)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=5)
+        self.BOOL_WORD_TINKERED = True
+    
+    def _word_pred_type(self, event, frame):
+        if self.wordPredType.get() == 'Current Word':
             # row 4
-            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=4)
-            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=4)
+            ttk.Label(frame, text ="Prediction Approach").grid(sticky="E", column=0, row=4)
+            self.wordPredApproach = ttk.Combobox(frame, values=self.WORD_PRED_APPROACH_FIXED, state="readonly")
+            self.wordPredApproach.grid(sticky="W", column=1, row=4)
+            self.wordPredApproach.current(0)
+            
+            self.WORD_PRED_TASK = "WORD_BM25OKAPI"
+            # row 5
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=5)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=5)
+        else:
+            # row 4
+            ttk.Label(frame, text ="Prediction Approach").grid(sticky="E", column=0, row=4)
+            self.wordPredApproach = ttk.Combobox(frame, values=self.WORD_PRED_APPROACH, state="readonly")
+            self.wordPredApproach.grid(sticky="W", column=1, row=4)
+            self.wordPredApproach.current(0)
+            self.wordPredApproach.bind("<<ComboboxSelected>>", lambda event: self._word_pred_approach(event, frame)) 
+            
+            self.WORD_PRED_TASK = "WORD_BM25OKAPI"
+            # row 5
+            ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=5)
+            ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=5)
         self.BOOL_WORD_TINKERED = True
 
     def _word_pred_panel(self, root, frame):
@@ -309,15 +339,21 @@ class View_tinker:
         self.wordDisplayLocation.current(1)
 
         # row 3
-        ttk.Label(frame, text ="Prediction Approach").grid(sticky="E", column=0, row=3)
+        ttk.Label(frame, text ="Type").grid(sticky="E", column=0, row=3)
+        self.wordPredType = ttk.Combobox(frame, values=self.WORD_PRED_TYPE, state="readonly")
+        self.wordPredType.grid(sticky="W", column=1, row=3)
+        self.wordPredType.bind("<<ComboboxSelected>>", lambda event: self._word_pred_type(event, frame))
+
+        # row 4
+        ttk.Label(frame, text ="Prediction Approach").grid(sticky="E", column=0, row=4)
         self.wordPredApproach = ttk.Combobox(frame, values=self.WORD_PRED_APPROACH, state="readonly")
-        self.wordPredApproach.grid(sticky="W", column=1, row=3)
+        self.wordPredApproach.grid(sticky="W", column=1, row=4)
         # self.wordPredApproach.current(0)
         self.wordPredApproach.bind("<<ComboboxSelected>>", lambda event: self._word_pred_approach(event, frame)) 
 
-        # row 4
-        ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=4)
-        ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=4)
+        # row 5
+        ttk.Label(frame, text="", width=19, padding=5).grid(sticky="E", column=0, row=5)
+        ttk.Label(frame, text="", width=21, padding=5).grid(sticky="W", column=1, row=5)
 
 
         
