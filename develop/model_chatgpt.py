@@ -11,7 +11,7 @@ class Model_ChatGPT:
         self.SENTENCE_ENTRY_APPROACH = sentence_entry_approach
         self.INTERACTION_SCENARIO = interaction_scenario
         self.TEMPERATURE = temperature
-        self.HISTORY_LENGTH = 100
+        self.HISTORY_LENGTH = 60
         self.history = []
         # prompt = ""
         if sentence_entry_approach == "Left to right" and interaction_scenario == "Dialogue":
@@ -46,21 +46,21 @@ class Model_ChatGPT:
     def _assign_task_left_to_right_narrative(self):
         history = ""
         message = ""
-        prompt = f"Complete the sentence based on the conversation history. Example: System input: History: ['A: I am a researcher at Cambridge.']. Sentence to be completed: 'My research'. System output: 'My research focuses on assistive technology.'"
+        prompt = f"Complete the sentence based on the conversation history. Example: System input: History: ['A: I am a researcher at university.']. Sentence to be completed: 'My research'. System output: 'My research focuses on human-AI interaction.'"
         text = self.generate_sentences(history, message, prompt)
         # print("AI: "+text[0])
 
     def _assign_task_keywords_dialogue(self):
         history = ""
         message = ""
-        prompt = "Generate the sentence based on the conversation history and the given keywords. Example: System input: History: ['A: Do you have plans after work today?', 'B: I don't have plans yet. What about you?']. Keywords for replying B: ['movies', 'tonight', 'join']. System out put: 'I am going to watch movies tonight. Do you wanna join me?'"
+        prompt = "Generate a sentence based on the conversation history and the given keywords. Example: System input: History: ['A: Do you have plans after work today?', 'B: I don't have plans yet. What about you?']. Keywords for replying B: ['movies', 'tonight', 'join']. System out put: 'I am going to watch movies tonight. Do you wanna join me?'"
         text = self.generate_sentences(history, message, prompt)
         # print("AI: "+text[0])
 
     def _assign_task_keywords_narrative(self):
         history = ""
         message = ""
-        prompt = f"Generate the sentence based on the conversation history and the given keywords. Example: System input: History: ['A: I am not feeling well.'] Keywords for generating the sentence: ['stomachache', 'morning']. System output: 'I have had a stomachache since this morning.'"
+        prompt = f"Infer a sentence based on the conversation history and the given keywords. Example: System input: History: ['A: I am not feeling well.'] Keywords for generating the sentence: ['stomachache', 'morning']. System output: 'I have had a stomachache since this morning.'"
         text = self.generate_sentences(history, message, prompt)
         # print("AI: "+text[0])
 
@@ -80,7 +80,7 @@ class Model_ChatGPT:
     def get_conversation_history(self):
         return self.history
 
-    def clean_generated_sentence_list(self, old_list):
+    def clean_generated_sentence_list(self, old_list, message):
         new_list = []
         for sen in old_list:
             if '\n' in sen:
@@ -98,6 +98,16 @@ class Model_ChatGPT:
                     pass
                 else:
                     new_list.append(sen)
+        
+        if self.SENTENCE_ENTRY_APPROACH == "Left to right":
+            temp_list = new_list
+            new_list = []
+            for sentence in temp_list:
+                message = message.strip()
+                if message.lower() != sentence[0:len(message)].lower():
+                    sentence = message + ' ' + sentence
+                    sentence = re.sub(' +', ' ', sentence)
+                    new_list.append(sentence)
         return new_list
     
     def clean_generated_word_list(self, old_string):
@@ -129,16 +139,18 @@ class Model_ChatGPT:
         ctypes.windll.user32.MessageBoxW(0, "ChatGPT server has reached the capacity, please try this function later.", "Info", 0)
 
     def generate_sentences(self, history, message, prompt=None):
+        message = re.sub(' +', ' ', message)
+        # print(message)
         if prompt == None:
             if self.SENTENCE_ENTRY_APPROACH == "Left to right" and self.INTERACTION_SCENARIO == "Dialogue":
-                prompt = f"Complete the sentence based on the conversation history: {history}. Sentence to be completed: {message}. "
+                prompt = f"Complete the sentence based on the conversation history: {history}. Sentence to be completed: '{message}'. Continue the sentence and do not repeat '{message}'."
             elif self.SENTENCE_ENTRY_APPROACH == "Left to right" and self.INTERACTION_SCENARIO == "Narrative":
-                prompt = f"Complete the sentence based on the text input history: {history}. Sentence to be completed: {message}. "
+                prompt = f"Complete the sentence based on the text input history: {history}. Sentence to be completed: '{message}'. Continue the sentence and do not repeat '{message}'."
             elif self.SENTENCE_ENTRY_APPROACH == "Keywords" and self.INTERACTION_SCENARIO == "Dialogue":
-                prompt = f"Generate the sentence based on the conversation history: {history}. Keywords for generating the sentence: {message}. "
+                prompt = f"Generate a sentence based on the conversation history: {history}. Keywords for generating the sentence: {message}. Do not repeat history infomation in the new sentence. Keep the new sentence simple."
             else:
                 # self.SENTENCE_ENTRY_APPROACH == "Keywords" and self.INTERACTION_SCENARIO == "Narrative":
-                prompt = f"Generate the sentence based on the text input history: {history}. Keywords for generating the sentence: {message}. "
+                prompt = f"Infer the next sentence based on the narrative history: {history}. Keywords for generating the sentence: {message}. Do not repeat history infomation in the new sentence. Keep the new sentence simple."
         
         genSentenceList = []
         try:
@@ -148,7 +160,7 @@ class Model_ChatGPT:
                 n=8,
                 stop=None,
                 temperature=self.TEMPERATURE,
-                max_tokens=100
+                max_tokens=200
             )
 
             i = 0
@@ -157,7 +169,11 @@ class Model_ChatGPT:
                 # print("AI - "+ str(i) + ": " + choice.text.strip())
                 genSentenceList.append(choice.text.strip())
                 i+=1
-            genSentenceList = self.clean_generated_sentence_list(genSentenceList)
+            genSentenceList = self.clean_generated_sentence_list(genSentenceList, message)
+
+            
+
+
 
         except openai.error.RateLimitError:
             response = openai.Completion.create(
@@ -166,7 +182,7 @@ class Model_ChatGPT:
                 n=8,
                 stop=None,
                 temperature=self.TEMPERATURE,
-                max_tokens=100
+                max_tokens=200
             )
 
             i = 0
@@ -212,7 +228,7 @@ class Model_ChatGPT:
                 n=1,
                 stop=None,
                 temperature=self.TEMPERATURE,
-                max_tokens=100
+                max_tokens=200
             )
             i = 0
             if len(response.choices) > 0:
@@ -230,68 +246,106 @@ class Model_ChatGPT:
 
 
 if __name__ == '__main__':
-    dialogue = Model_ChatGPT(option="WORD_CHATGPT", sentence_entry_approach="Left to right", interaction_scenario="WORD_PRED", temperature=0.9)
+    # dialogue = Model_ChatGPT(option="WORD_CHATGPT", sentence_entry_approach="Left to right", interaction_scenario="WORD_PRED", temperature=0.9)
+    dialogue = Model_ChatGPT(option="WORD_CHATGPT", sentence_entry_approach="Left to right", interaction_scenario="Narrative", temperature=0.5)
+
     history = []
+    l2r = True
+    
+    # Word pred
+    # while True:
+    #     a_message = ""
+    #     while True:
+    #         temp = input(f"A: {a_message}")
+    #         a_message = a_message + temp + " "
+    #         print(a_message)
+    #         if a_message.lower() == 'exit':
+    #             break
+    #         genWordList = dialogue.generate_words(history, a_message)
+    #         i = 0
+    #         for word in genWordList:
+    #             print("AI - "+ str(i) + ": " + word)
+    #             i+=1
+    #         select = int(input("Select: "))
+    #         if select > 3:
+    #             continue
+    #         else: 
+    #             selectResponce = genWordList[select]
+    #             print("Selected: "+selectResponce)
+    #             history.append(f"A: {a_message + ' ' + selectResponce}")
+    #             break
+
+    #     b_message = input("B: ")
+    #     history.append(f"B: {b_message}")
+    #     print("History: ")
+    #     print(history)
+    #     if len(history) > 60: # self.HISTORY_LENGTH
+    #         history.pop(0)
+
+
+
+    # # Dialogue
+    # while True:
+    #     a_message = ""
+    #     while True: 
+    #         temp = input(f"A: {a_message}")
+    #         a_message = a_message + temp + " "
+    #         print(a_message)
+    #         if a_message.lower() == 'exit':
+    #             break
+            
+    #         genSentenceList = dialogue.generate_sentences(history, a_message) 
+    #         i = 0
+    #         for sen in genSentenceList:
+    #             print("AI - "+ str(i) + ": " + sen)
+    #             i+=1
+    #         select = int(input("Select: "))
+    #         if select > 3:
+    #             continue
+    #         else: 
+    #             selectResponce = genSentenceList[select]
+    #             print("Selected: "+selectResponce)
+    #             history.append(f"A: {selectResponce}")
+    #             break
+
+    #     b_message = input("B: ")
+    #     history.append(f"B: {b_message}")
+    #     if len(history) > 5: # self.HISTORY_LENGTH
+    #         history.pop(0)
+
+
+
+    # Narrative
     while True:
-        a_message = ""
-        while True:
-            temp = input(f"A: {a_message}")
-            a_message = a_message + temp + " "
-            print(a_message)
-            if a_message.lower() == 'exit':
+        message = ""
+        while True: 
+            temp = input(f"Keywords: {message}")
+            message = message + temp + " "
+            print(message)
+            if message.lower() == 'exit':
                 break
-            genWordList = dialogue.generate_words(history, a_message)
+            # prompt = f"Complete the sentence based on the conversation history: {history}. Sentence to be completed: {a_message}. "
+            
+            genSentenceList = dialogue.generate_sentences(history, message) 
             i = 0
-            for word in genWordList:
-                print("AI - "+ str(i) + ": " + word)
+            for sen in genSentenceList:
+                print("AI - "+ str(i) + ": " + sen)
                 i+=1
-            select = int(input("Select: "))
+            select = input("Select: ")
+            if select.isdigit():
+                select = int(select)
+            else:
+                break
             if select > 3:
                 continue
             else: 
-                selectResponce = genWordList[select]
+                selectResponce = genSentenceList[select]
                 print("Selected: "+selectResponce)
-                history.append(f"A: {a_message + ' ' + selectResponce}")
+                history.append(f"{selectResponce}")
                 break
 
-        b_message = input("B: ")
-        history.append(f"B: {b_message}")
-        print("History: ")
-        print(history)
-        if len(history) > 100: # self.HISTORY_LENGTH
+        if len(history) > 5: # self.HISTORY_LENGTH
             history.pop(0)
-
-
-
-        # a_message = ""
-        # while True: 
-        #     temp = input(f"A: {a_message}")
-        #     a_message = a_message + temp + " "
-        #     print(a_message)
-        #     if a_message.lower() == 'exit':
-        #         break
-        #     # prompt = f"Complete the sentence based on the conversation history: {history}. Sentence to be completed: {a_message}. "
-            
-        #     genSentenceList = dialogue.generate_sentences(history, a_message) 
-        #     i = 0
-        #     for sen in genSentenceList:
-        #         print("AI - "+ str(i) + ": " + sen)
-        #         i+=1
-        #     select = int(input("Select: "))
-        #     if select > 3:
-        #         continue
-        #     else: 
-        #         selectResponce = genSentenceList[select]
-        #         print("Selected: "+selectResponce)
-        #         history.append(f"A: {selectResponce}")
-        #         break
-
-        # b_message = input("B: ")
-        # history.append(f"B: {b_message}")
-        # print("History: ")
-        # print(history)
-        # if len(history) > 100: # self.HISTORY_LENGTH
-        #     history.pop(0)
 
 
 
